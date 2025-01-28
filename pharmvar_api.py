@@ -3,19 +3,29 @@ import requests
 import requests.packages
 from typing import List, Dict, Optional
 from exceptions import InvalidArgumentError
-from models import Result, Variant, VariantCollection
+from models import Result, Variant, VariantCollection, Allele, AlleleCollection
 from json import JSONDecodeError
 from rest_adapter import RestAdapter
-from endpoints import VariantEndpoint
+from endpoints import VariantEndpoint, AlleleEndPoint
 
 class PharmVarApi:
-    def __init__(self, hostname: str = "www.pharmvar.org/api-service", api_key: str = '', ver: str = '0.1', ssl_verify: bool = True, logger: logging.Logger = None):
+    """
+    PharmVarApi is a class that provides methods to interact with the PharmVar API.
+    It uses a RestAdapter object to make HTTP requests to the API server.
+    The class provides methods to get variants, alleles and genes from the PharmVar database.
+    """    
+    # Initialize the PharmVarApi object with a RestAdapter object
+    def __init__(self, hostname: str = "www.pharmvar.org/api-service", api_key: str = '', ver: str = '0.1', ssl_verify: bool = False, logger: logging.Logger = None):
         self._rest_adapter = RestAdapter(hostname, api_key, ver, ssl_verify, logger)
+    
+    # Variant methods
 
     def get_all_variants(self) -> VariantCollection:
+
+        ### TODO: add parameters
         """
         Get all variants from the PharmVar database.
-        :return: VariantCollection object containing all variants
+        return: VariantCollection object containing all variants
         """
 
         result = self._rest_adapter._do(http_method = 'GET', endpoint = VariantEndpoint.ALL.value)
@@ -75,10 +85,78 @@ class PharmVarApi:
         if rs_id is not None:
             endpoint = VariantEndpoint.RSID_IMPACT.value.format(rsId=rs_id)
         elif spdi is not None:
-            endpoint = VariantEndpoint.SPDI_IMPACT.value.format(spdi=spdi)
+            endpoint = VariantEndpoint.SPDI_IMPACT.value.format(spdi= spdi)
         else:
             raise InvalidArgumentError("Either rs_id or spdi must be provided.")
 
         result = self._rest_adapter._do(http_method = "GET", endpoint = endpoint, headers = {"Accept" : "text/plain"})
 
-   
+        # Allele methods
+
+    def get_all_alleles(
+            self,
+            exclude_sub_alleles: bool = False,
+            function: Optional[str] = None,
+            include_reference_variants: bool = False,
+            include_retired_alleles: bool = False,
+            include_retired_reference_sequences: bool = False,
+            min_evidence_level: Optional[str] = None,
+            position: Optional[int] = None,
+            reference_base_sequence: Optional[str] = None,
+            reference_collection: Optional[str] = None,
+            reference_location_type: Optional[str] = None,
+            reference_sequence: Optional[str] = None,
+            variant_base_sequence: Optional[str] = None
+        ) -> AlleleCollection:
+            """
+            Get all alleles from the PharmVar database with optional filtering parameters.
+
+            Parameters:
+                exclude_sub_alleles (bool): Exclude sub-allele definitions from results. Default is False.
+                function (Function): Filter results by function (decreased function, function not assigned, increased function, normal function, possibly decreased, severely decreased, uncertain function, unknown function).
+                include_reference_variants (bool): Include reference variants like A>A or C>C. Default is False.
+                include_retired_alleles (bool): Include retired allele definitions from previous versions. Default is False.
+                include_retired_reference_sequences (bool): Include variants from retired reference sequences. Default is False.
+                min_evidence_level (EvidenceLevel): Filter by minimum evidence level (Definitive, Limited, Moderate).
+                position (int): Filter results by variant position.
+                reference_base_sequence (ReferenceBase): Filter by reference base sequence (A, C, G, T).
+                reference_collection (ReferenceCollection): Filter by reference collection (GRCh37, GRCh38, etc.).
+                reference_location_type (ReferenceLocationType): Filter by reference starting location.
+                reference_sequence (str): Filter by reference sequence (e.g., "NG_008376.4").
+                variant_base_sequence (ReferenceBase): Filter by observed variant base sequence (A, C, G, T).
+
+            Returns:
+                AlleleCollection: Collection of alleles matching the specified criteria
+            """
+            params = {
+                "exclude-sub-alleles": exclude_sub_alleles,
+                "include-reference-variants": include_reference_variants,
+                "include-retired-alleles": include_retired_alleles,
+                "include-retired-reference-sequences": include_retired_reference_sequences
+            }
+
+            # Add optional parameters if they are provided
+            if function:
+                params["function"] = function
+            if min_evidence_level:
+                params["min-evidence-level"] = min_evidence_level
+            if position:
+                params["position"] = position
+            if reference_base_sequence:
+                params["reference-base-sequence"] = reference_base_sequence
+            if reference_collection:
+                params["reference-collection"] = reference_collection
+            if reference_location_type:
+                params["reference-location-type"] = reference_location_type
+            if reference_sequence:
+                params["reference-sequence"] = reference_sequence
+            if variant_base_sequence:
+                params["variant-base-sequence"] = variant_base_sequence
+
+            result = self._rest_adapter._do(
+                http_method='GET', 
+                endpoint=AlleleEndPoint.ALL.value,
+                params=params
+            )
+            
+            return AlleleCollection(data=result.data)
