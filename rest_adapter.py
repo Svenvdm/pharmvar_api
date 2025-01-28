@@ -26,48 +26,92 @@ class RestAdapter:
         if not ssl_verify:
             requests.packages.urllib3.disable_warnings()
 
-    def _do(self, http_method: str, endpoint: str, params: Dict = None, data: Dict = None, headers: Dict = {"Accept" : "application/json"}) -> Result:
+    def _do(self, http_method: str, endpoint: str, params: Dict = None, data: Dict = None, headers: Dict = {"Accept": "*/*"}) -> Result:
+        """
+        Execute HTTP request with logging and error handling
+        
+        Args:
+            http_method (str): HTTP method (GET, POST, etc.)
+            endpoint (str): API endpoint
+            params (Dict, optional): Query parameters
+            data (Dict, optional): Request body data
+            headers (Dict, optional): Request headers
+                
+        Returns:
+            Result: Response data wrapped in Result object
+                
+        Raises:
+            PharmVarApiException: If request fails or response is invalid
+            NoDataFoundError: If no data is returned for valid request
+        """
         full_url = f"{self.url}{endpoint}"
-        print(headers)
         log_line_pre = f"method={http_method}, url={full_url}, params={params}"
-        log_line_post = ', '.join((log_line_pre, "success={}, status_code={}, message={}"))
-        # Log HTTP params and perform an HTTP request, catching and re-raising any exceptions
+        
         try:
-            self._logger.debug(msg = log_line_pre)   
-            response = requests.request(method = http_method,
-                                    url = full_url,
-                                    headers = headers,
-                                    params = params,
-                                    data = data,
-                                    verify = self._ssl_verify)
+            self._logger.debug(msg=log_line_pre)   
+            response = requests.request(
+                method=http_method,
+                url=full_url,
+                headers=headers,
+                params=params,
+                data=data,
+                verify=self._ssl_verify
+            )
         except requests.exceptions.RequestException as e:
-            self._logger.error(msg=(str(e)))
+            self._logger.error(msg=str(e))
             raise PharmVarApiException("Request failed") from e
 
-        # Deserialize JSON output to Python object, or return failed Result on exception
-        print(response.text)
+        # Check content type of response
+        content_type = response.headers.get('Content-Type', '')
+        
+        # Try to parse response data based on content type
         try:
-            if headers["Accept"] == "application/json":
+            if 'application/json' in content_type or headers.get('Accept') == 'application/json':
                 data_out = response.json()
-            elif headers["Accept"] == "text/plain":
+            elif 'text/plain' in content_type or headers.get('Accept') == 'text/plain':
                 data_out = response.text
+                # Handle case where error response is JSON even with text/plain
+                if response.status_code >= 400:
+                    try:
+                        data_out = response.json()
+                    except:
+                        pass
+            else:
+                # For */* or unknown content types, try JSON first then fall back to text
+                try:
+                    data_out = response.json()
+                except (JSONDecodeError, ValueError):
+                    data_out = response.text
         except (JSONDecodeError, ValueError) as e:
-            self._logger.error(msg = log_line_post.format("False", "None", e)) 
-            raise PharmVarApiException("Bad JSON in response") from e
+            log_msg = f"{log_line_pre}, success=False, status_code=None, message={str(e)}"
+            self._logger.error(msg=log_msg)
+            raise PharmVarApiException("Failed to parse response data") from e
 
-        # If status_code in 200-299 range, return success Result with data, otherwise raise exception
+        # Check for success and handle errors
         is_success = 200 <= response.status_code <= 299
-        log_line = log_line_post.format(is_success, response.status_code, response.reason)
+        log_msg = f"{log_line_pre}, success={is_success}, status_code={response.status_code}, message={response.reason}"
+        
         if is_success:
-            self._logger.debug(msg = log_line)
-            result = Result(status_code = response.status_code, message = response.reason, data = data_out)
-            if not result.data:
-                # current behaviour for empty data is to raise an exception, but could be changed to return a Result with empty data
+            self._logger.debug(msg=log_msg)
+            result = Result(status_code=response.status_code, message=response.reason, data=data_out)
+            if not result.data and isinstance(data_out, (list, dict)):
                 raise NoDataFoundError(f"No data found for endpoint: {endpoint}")
             return result
-        self._logger.error(msg = log_line)
-        raise PharmVarApiException(f"Request failed with status code {response.status_code}: {data_out["errorMessage"] if data_out else response.reason}")
 
+        # Handle error response
+        self._logger.error(msg=log_msg)
+        
+        # Extract error message from response
+        error_message = None
+        if isinstance(data_out, dict):
+            error_message = data_out.get("errorMessage")
+        if not error_message:
+            error_message = response.reason
+            
+        # Special handling for 404 errors
+        if response.status_code == 404 or (isinstance(data_out, dict) and data_out.get("errorCode") == 404):
+            raise NoDataFoundError(error_message)
+        
     def get(self, endpoint: str, params: Dict = None) -> Result:
         """
         Perform an HTTP GET request to the API
