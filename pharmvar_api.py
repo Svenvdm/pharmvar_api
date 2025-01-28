@@ -89,8 +89,14 @@ class PharmVarApi:
         else:
             raise InvalidArgumentError("Either rs_id or spdi must be provided.")
 
-        result = self._rest_adapter._do(http_method = "GET", endpoint = endpoint, headers = {"Accept" : "text/plain"})
-
+        result = self._rest_adapter._do(http_method = "GET", endpoint = endpoint, headers={"Accept": "*/*"})
+        # Save in Variant instance with rs_id or spdi and impact
+        allele = Variant(impact = result.data, rsId = rs_id,
+                        referenceSequence = spdi.split(":")[0] if spdi else None,
+                        position = spdi.split(":")[1] if spdi else None
+                        )
+        return allele.impact
+    
         # Allele methods
 
     def get_all_alleles(
