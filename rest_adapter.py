@@ -21,6 +21,7 @@ class RestAdapter:
         self._api_key = api_key
         self._ssl_verify = ssl_verify
         self._logger = logger or logging.getLogger(__name__)
+        self._version = version
 
         if not ssl_verify:
             requests.packages.urllib3.disable_warnings()
