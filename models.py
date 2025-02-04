@@ -1,4 +1,5 @@
-from typing import List, Dict
+from typing import List, Dict, Optional, Any
+from enums import Function, EvidenceLevel, ReferenceBase, ReferenceCollection, ReferenceLocationType
    
 
 class Result:
@@ -15,7 +16,16 @@ class Result:
 
 
 class Variant:
-    def __init__(self, hgvs: str, impact: str, position: str, referenceCollections: List[str], referenceLocation: str, referenceSequence: str, rsId: str, url: str, variantFrequency: List[Dict], variantId: str):
+    def __init__(self, hgvs: str = None,
+                impact: str = None,
+                position: str = None,
+                referenceCollections: List[str] = None,
+                referenceLocation: str = None,
+                referenceSequence: str = None,
+                rsId: str = None,
+                url: str = None,
+                variantFrequency: List[Dict] = None,
+                variantId: str = None):
         """
         Represents a variant
         :param hgvs: The HGVS syntax for the variant
@@ -187,6 +197,7 @@ class Allele:
                 f"allele_type={self.allele_type}, "
                 f"gene_symbol={self.gene_symbol}, "
                 f"pv_id={self.pv_id})")
+        
     
 class AlleleCollection:
     def __init__(self, data: List[Dict] = None):
@@ -196,10 +207,30 @@ class AlleleCollection:
         """
         if not data:
             data = []
-        self.alleles = [Allele(**allele) for allele in data]
-
+        ## unpack dictionary
+        self.alleles = [Allele(**allele) if isinstance(allele, dict) else allele for allele in data]
     ## create method that gets all the variants with an impact.
     
+    def filter(self, **kwargs) -> 'AlleleCollection':
+        """
+        Filter the alleles in the collection by the given keyword arguments.
+        :param kwargs: A dictionary of keyword arguments to filter the alleles by
+        :return: A new AlleleCollection object containing the filtered alleles
+        """
+
+    
+        ### TODO: implement error when key is not in allele object.
+        ### TODO: implement filter functionality
+        if not kwargs:
+            return self
+        
+        valid_attrs = self.alleles[0].__dict__.keys()
+        invalid_attrs = [key for key in kwargs.keys() if key not in valid_attrs]
+        if invalid_attrs:
+            raise ValueError(f"Invalid keyword argument provided: {invalid_attrs}")
+        return AlleleCollection(data = [allele for allele in self.alleles
+                                         if all(getattr(allele, key) == value
+                                         for key, value in kwargs.items())])
 
     def __len__(self) -> int:
         return len(self.alleles)
