@@ -1,13 +1,9 @@
+from typing import Optional
 import logging
-import requests
-import requests.packages
-from typing import List, Dict, Optional
-from exceptions import InvalidArgumentError
-from models import Result, Variant, VariantCollection, Allele, AlleleCollection
-from json import JSONDecodeError
-from rest_adapter import RestAdapter
-from endpoints import VariantEndpoint, AlleleEndPoint
-
+from exceptions.exceptions import InvalidArgumentError
+from api import RestAdapter, VariantEndpoint, AlleleEndPoint
+from models import Variant, VariantCollection, AlleleCollection
+from config import APIConfig
 class PharmVarApi:
     """
     PharmVarApi is a class that provides methods to interact with the PharmVar API.
@@ -15,8 +11,8 @@ class PharmVarApi:
     The class provides methods to get variants, alleles and genes from the PharmVar database.
     """    
     # Initialize the PharmVarApi object with a RestAdapter object
-    def __init__(self, hostname: str = "www.pharmvar.org/api-service", api_key: str = '', ver: str = '0.1', ssl_verify: bool = False, logger: logging.Logger = None):
-        self._rest_adapter = RestAdapter(hostname, api_key, ver, ssl_verify, logger)
+    def __init__(self, hostname: str = APIConfig.DEFAULT_HOST, api_key: str = '', ver: str = APIConfig.DEFAULT_VERSION, logger: logging.Logger = APIConfig.DEFAULT_LOGGER):
+        self._rest_adapter = RestAdapter(hostname, api_key, ver, logger)
     
     # Variant methods
 
