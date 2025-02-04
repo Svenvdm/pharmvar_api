@@ -1,6 +1,7 @@
 from typing import List, Dict, Optional, Any
-from enums import Function, EvidenceLevel, ReferenceBase, ReferenceCollection, ReferenceLocationType
-   
+from enums.enums import Function, EvidenceLevel, ReferenceBase, ReferenceCollection, ReferenceLocationType, FilterError
+from exceptions.exceptions import ValidationError
+from .base_collection import BaseCollection
 
 class Result:
     def __init__(self, status_code: int, message: str = "", data: List[Dict] = None):
@@ -91,13 +92,12 @@ class VariantGroup:
                 f"impact={self.impact}, "
                 f"hgvs_gene={self.hgvs_gene})")
 
-class VariantGroupCollection:
+class VariantGroupCollection(BaseCollection):
     def __init__(self, data: List[Dict] = None):
         """
         Represents a list of variant groups
         :param variant_groups: List of VariantGroup objects
         """
-
         if not data:
             data = []
         self.variant_groups = [VariantGroup(**group) for group in data] if data else []
@@ -114,17 +114,20 @@ class VariantGroupCollection:
     def __repr__(self) -> str:
         return f"VariantGroupList(variant_groups={self.variant_groups})"
 
+    def _get_items(self):
+        return self.variant_groups
+    
 
-class VariantCollection:
+class VariantCollection(BaseCollection):
     def __init__(self, data: List[Dict] = None):
         """
         Represents a list of variants
         :param variants: List of Variant objects
         """
-        self.variants = [Variant(**variant) for variant in data] if data else []
+        # unpack dictionary if variant data is in dictionary format, otherwise it should be a Variant object
+        self.variants = [Variant(**variant) if isinstance(variant, dict) else variant for variant in data] if data else []
 
-    ## create method that gets all the variants with an impact.
-    
+    ###todo: create method that gets all the variants with an impact.
 
     def __len__(self) -> int:
         return len(self.variants)
@@ -137,6 +140,9 @@ class VariantCollection:
 
     def __repr__(self) -> str:
         return f"VariantList(variants={self.variants})"
+    
+    def _get_items(self):
+        return self.variants
 
 class Allele:
     """
@@ -199,7 +205,7 @@ class Allele:
                 f"pv_id={self.pv_id})")
         
     
-class AlleleCollection:
+class AlleleCollection(BaseCollection):
     def __init__(self, data: List[Dict] = None):
         """
         Represents a list of alleles
@@ -207,30 +213,11 @@ class AlleleCollection:
         """
         if not data:
             data = []
-        ## unpack dictionary
+        # unpack dictionary if variant data is in dictionary format, otherwise it should be a Variant object
         self.alleles = [Allele(**allele) if isinstance(allele, dict) else allele for allele in data]
-    ## create method that gets all the variants with an impact.
-    
-    def filter(self, **kwargs) -> 'AlleleCollection':
-        """
-        Filter the alleles in the collection by the given keyword arguments.
-        :param kwargs: A dictionary of keyword arguments to filter the alleles by
-        :return: A new AlleleCollection object containing the filtered alleles
-        """
 
-    
-        ### TODO: implement error when key is not in allele object.
-        ### TODO: implement filter functionality
-        if not kwargs:
-            return self
-        
-        valid_attrs = self.alleles[0].__dict__.keys()
-        invalid_attrs = [key for key in kwargs.keys() if key not in valid_attrs]
-        if invalid_attrs:
-            raise ValueError(f"Invalid keyword argument provided: {invalid_attrs}")
-        return AlleleCollection(data = [allele for allele in self.alleles
-                                         if all(getattr(allele, key) == value
-                                         for key, value in kwargs.items())])
+    def _get_items(self):
+        return self.alleles
 
     def __len__(self) -> int:
         return len(self.alleles)
