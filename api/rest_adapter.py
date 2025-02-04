@@ -14,7 +14,6 @@ class RestAdapter:
         :param hostname: The hostname of the API server: e.g. www.pharmvar.org/api-service
         :param api_key (optional): The API key to use for authentication
         :param version: The version of the API to use: currently only "0.1" is supported
-        :param ssl_verify: Normally set to True, but if having SSL/TLS cert validation issues, can turn off with False
         :param logger (optional): pass your logger here to use it, otherwise a new logger will be created
         """
 
