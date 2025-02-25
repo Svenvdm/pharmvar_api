@@ -28,22 +28,84 @@ class PharmVarApi:
         return VariantCollection(data = result.data)
 
 
-    def get_variants_by_gene(self, gene_symbol: str) -> VariantCollection:
+    def get_variants_by_gene(self,
+                            gene_symbol: str,
+                            include_reference_variants: bool = False,
+                            include_retired_reference_sequences: bool = False,
+                            position = None,
+                            reference_base_sequence = None,
+                            reference_collection = None,
+                            reference_location_type = None,
+                            reference_sequence = None,
+                            variant_base_sequence = None
+                            ) -> VariantCollection:
         """
         Get all variants for a given gene symbol.
         :param gene_symbol: The gene symbol to search for
+        :param include_reference_variants: Include reference variants like A>A or C>C. Default is False.
+        :param include_retired_reference_sequences: Include variants from retired reference sequences. Default is False.
+        :param position: Filter results by variant position.
+        :param reference_base_sequence: Filter by reference base sequence (A, C, G, T).
+        :param reference_collection: Filter by reference collection (GRCh37, GRCh38, etc.).
+        :param reference_location_type: Filter by reference starting location.
+        :param reference_sequence: Filter by reference sequence (e.g., "NG_008376.4").
+        :param variant_base_sequence: Filter by observed variant base sequence (A, C, G, T).
         :return: VariantCollection object containing all variants for the gene
         """
+
+        params = {
+            "include-reference-variants": include_reference_variants,
+            "include-retired-reference-sequences": include_retired_reference_sequences,
+            "position": position,
+            "reference-base-sequence": reference_base_sequence,
+            "reference-collection": reference_collection,
+            "reference-location-type": reference_location_type,
+            "reference-sequence": reference_sequence,
+            "variant-base-sequence": variant_base_sequence
+        }
+
+
         endpoint = VariantEndpoint.GENE.value.format(symbol = gene_symbol)
-        result = self._rest_adapter._do(http_method = 'GET', endpoint = endpoint)
+        result = self._rest_adapter._do(http_method = 'GET', endpoint = endpoint, params = params)
         return VariantCollection(data = result.data)
 
-    def get_variants_by_allele(self, identifier: str) -> VariantCollection:
+    def get_variants_by_allele(self, identifier: str,
+                                include_reference_variants: bool = False,
+                                include_retired_alleles: bool = False,
+                                include_retired_reference_sequences: bool = False,
+                                position = None,
+                                reference_base_sequence = None, 
+                                reference_collection = None,
+                                reference_location_type = None,
+                                reference_sequence = None,
+                                variant_base_sequence = None
+                               ) -> VariantCollection:
         """
         Get all variants for a given identifier.
-        :param identifier: can be either a PharmVar ID or an allele name.
+        :param identifier: can be either a PharmVar ID or an allele name. Required
+        :param include_reference_variants: Include reference variants like A>A or C>C. Default is False.
+        :param include_retired_alleles: Include retired allele definitions from previous versions. Default is False.
+        :param include_retired_reference_sequences: Include variants from retired reference sequences. Default is False.
+        :param position: Filter results by variant position.
+        :param reference_base_sequence: Filter by reference base sequence (A, C, G, T).
+        :param reference_collection: Filter by reference collection (GRCh37, GRCh38, etc.).
+        :param reference_location_type: Filter by reference starting location.
+        :param reference_sequence: Filter by reference sequence (e.g., "NG_008376.4").
+        :param variant_base_sequence: Filter by observed variant base sequence (A, C, G, T).
         :return: VariantCollection object containing all variants for the identifier.
         """
+        params = {
+            "include-reference-variants": include_reference_variants,
+            "include-retired-alleles": include_retired_alleles,
+            "include-retired-reference-sequences": include_retired_reference_sequences,
+            "position": position,
+            "reference-base-sequence": reference_base_sequence,
+            "reference-collection": reference_collection,
+            "reference-location-type": reference_location_type,
+            "reference-sequence": reference_sequence,
+            "variant-base-sequence": variant_base_sequence
+        }
+
         endpoint = VariantEndpoint.ALLELE.value.format(identifier = identifier)
         result = self._rest_adapter._do(http_method = 'GET', endpoint = endpoint)
         return VariantCollection(data = result.data)
