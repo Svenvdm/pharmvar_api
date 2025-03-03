@@ -32,7 +32,7 @@ class PharmVarApi:
                             gene_symbol: str,
                             include_reference_variants: bool = False,
                             include_retired_reference_sequences: bool = False,
-                            position = None,
+                            position: int = None,
                             reference_base_sequence = None,
                             reference_collection = None,
                             reference_location_type = None,
@@ -73,7 +73,7 @@ class PharmVarApi:
                                 include_reference_variants: bool = False,
                                 include_retired_alleles: bool = False,
                                 include_retired_reference_sequences: bool = False,
-                                position = None,
+                                position: int = None,
                                 reference_base_sequence = None, 
                                 reference_collection = None,
                                 reference_location_type = None,
@@ -110,14 +110,42 @@ class PharmVarApi:
         result = self._rest_adapter._do(http_method = 'GET', endpoint = endpoint)
         return VariantCollection(data = result.data)
     
-    def get_variants_by_rsid(self, rs_id: str) -> VariantCollection:
+    def get_variants_by_rsid(self, rs_id: str,
+                            include_reference_variants: bool = False,
+                            include_retired_reference_sequences: bool = False,
+                            position: int = None,
+                            reference_base_sequence: str = None,
+                            reference_collection: str = "GRCh38",
+                            reference_location_type: str = None,
+                            reference_sequence: str = None,
+                            variant_base_sequence: str = None
+                            ) -> VariantCollection:
         """
         Get all variants for a given rsID.
         :param rs_id: The rsId of the variant
+        :param include_reference_variants: Include reference variants like A>A or C>C. Default is False.
+        :param include_retired_reference_sequences: Include variants from retired reference sequences. Default is False.
+        :param position: Filter results by variant position.
+        :param reference_base_sequence: Filter by reference base sequence (A, C, G, T).
+        :param reference_collection: Filter by reference collection (GRCh37, GRCh38, etc.). Default is GRCh38.
+        :param reference_location_type: Filter by reference starting location.
+        :param reference_sequence: Filter by reference sequence (e.g., "NG_008376.4").
+        :param variant_base_sequence: Filter by observed variant base sequence (A, C, G, T).
         :return: VariantCollection object containing all variants for the rsID
         """
+        params = {
+            "include-reference-variants": include_reference_variants,
+            "include-retired-reference-sequences": include_retired_reference_sequences,
+            "position": position,
+            "reference-base-sequence": reference_base_sequence,
+            "reference-collection": reference_collection,
+            "reference-location-type": reference_location_type,
+            "reference-sequence": reference_sequence,
+            "variant-base-sequence": variant_base_sequence
+        }
+
         endpoint = VariantEndpoint.RSID.value.format(rsId = rs_id)
-        result = self._rest_adapter._do(http_method = 'GET', endpoint = endpoint)
+        result = self._rest_adapter._do(http_method = 'GET', endpoint = endpoint, params = params)
         return VariantCollection(data = result.data)
     
     def get_variants_by_spdi(self, spdi: str) -> VariantCollection:
@@ -149,11 +177,11 @@ class PharmVarApi:
 
         result = self._rest_adapter._do(http_method = "GET", endpoint = endpoint, headers={"Accept": "*/*"})
         # Save in Variant instance with rs_id or spdi and impact
-        allele = Variant(impact = result.data, rsId = rs_id,
+        variant = Variant(impact = result.data, rsId = rs_id,
                         referenceSequence = spdi.split(":")[0] if spdi else None,
                         position = spdi.split(":")[1] if spdi else None
                         )
-        return allele.impact
+        return variant.impact
     
         # Allele methods
 
