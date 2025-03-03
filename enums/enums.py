@@ -34,3 +34,19 @@ class ReferenceLocationType(str, Enum):
 class FilterError(Enum):
     INVALID_ATTRS = "Invalid attribute(s): {}"
     TYPE_MISMATCH = "Type mismatch for {}: expected {}, got {}"
+
+class QueryParameters(Enum):
+    GENE_SYMBOL = "gene-symbol"
+    IDENTIFIER = "identifier"
+    EXCLUDE_SUB_ALLELES = "exclude-sub-alleles"
+    FUNCTION = "function"
+    INCLUDE_REFERENCE_VARIANTS = "include-reference-variants"
+    INCLUDE_RETIRED_ALLELES = "include-retired-alleles"
+    INCLUDE_RETIRED_REFERENCE_SEQUENCES = "include-retired-reference-sequences"
+    MIN_EVIDENCE_LEVEL = "min-evidence-level"
+    POSITION = "position"
+    REFERENCE_BASE_SEQUENCE = "reference-base-sequence"
+    REFERENCE_COLLECTION = "reference-collection"
+    REFERENCE_LOCATION_TYPE = "reference-location-type"
+    REFERENCE_SEQUENCE = "reference-sequence"
+    VARIANT_BASE_SEQUENCE = "variant-base-sequence"
