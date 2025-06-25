@@ -1,6 +1,26 @@
 from enum import Enum
 
-class Function(str, Enum):
+class ExcludeSubAlleles(Enum):
+    TRUE = True
+    FALSE = False
+    DEFAULT = False
+
+class IncludeReferenceVariants(Enum):
+    TRUE = True
+    FALSE = False
+    DEFAULT = False
+
+class IncludeRetiredAlleles(Enum):
+    TRUE = True
+    FALSE = False
+    DEFAULT = False
+
+class IncludeRetiredReferenceSequences(Enum):
+    TRUE = True
+    FALSE = False
+    DEFAULT = False
+
+class Function(Enum):
     DECREASED = "decreased function"
     NOT_ASSIGNED = "function not assigned"
     INCREASED = "increased function"
@@ -9,37 +29,45 @@ class Function(str, Enum):
     SEVERELY_DECREASED = "severely decreased"
     UNCERTAIN = "uncertain function"
     UNKNOWN = "unknown function"
+    DEFAULT = None
 
-class EvidenceLevel(str, Enum):
+class EvidenceLevel(Enum):
     DEFINITIVE = "Definitive"
     LIMITED = "Limited"
     MODERATE = "Moderate"
+    DEFAULT = None
 
-class ReferenceBaseSequence(str, Enum):
+class Position(Enum):
+    DEFAULT = None
+
+class ReferenceBaseSequence(Enum):
     A = "A"
     C = "C"
     G = "G"
     T = "T"
+    DEFAULT = None
 
-class ReferenceCollection(str, Enum):
+class ReferenceCollection(Enum):
     GRCH37 = "GRCh37"
     GRCH38 = "GRCh38"
     REFSEQ_GENE = "RefSeqGene"
     REFSEQ_TRANSCRIPT = "RefSeqTranscript"
+    DEFAULT = "GRCh38"
 
-class ReferenceLocationType(str, Enum):
+class ReferenceLocationType(Enum):
     ATG_START = "ATG Start"
     SEQUENCE_START = "Sequence Start"
+    DEFAULT = None
 
-class VariantBaseSequence(str, Enum):
+class VariantBaseSequence(Enum):
     A = "A"
     C = "C"
     G = "G"
     T = "T"
+    DEFAULT = None
 
-class ReferenceSequence(str, Enum):
-    # too many possibilities
-    pass
+class ReferenceSequence(Enum):
+    DEFAULT = None
 
 class FilterError(Enum):
     INVALID_ATTRS = "Invalid attribute(s): {}"
