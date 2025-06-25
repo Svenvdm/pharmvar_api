@@ -4,7 +4,7 @@ from exceptions.exceptions import InvalidArgumentError
 from api import RestAdapter, VariantEndpoint, AlleleEndPoint
 from models import Variant, VariantCollection, AlleleCollection
 from config import APIConfig
-from enums.enums import QueryParameters
+from enums.enums import QueryParameters, IncludeReferenceVariants, IncludeRetiredAlleles, IncludeRetiredReferenceSequences, Function, EvidenceLevel, ReferenceBaseSequence, ReferenceCollection, ReferenceLocationType, VariantBaseSequence, Position, ReferenceSequence, ExcludeSubAlleles
 class PharmVarApi:
     """
     PharmVarApi is a class that provides methods to interact with the PharmVar API.
@@ -31,14 +31,14 @@ class PharmVarApi:
 
     def get_variants_by_gene(self,
                             gene_symbol: str,
-                            include_reference_variants: bool = False,
-                            include_retired_reference_sequences: bool = False,
-                            position: int = None,
-                            reference_base_sequence = None,
-                            reference_collection = None,
-                            reference_location_type = None,
-                            reference_sequence = None,
-                            variant_base_sequence = None
+                            include_reference_variants: bool = IncludeReferenceVariants.DEFAULT.value,
+                            include_retired_reference_sequences: bool = IncludeRetiredReferenceSequences.DEFAULT.value,
+                            position: int | None = Position.DEFAULT.value,
+                            reference_base_sequence: str | None = ReferenceBaseSequence.DEFAULT.value,
+                            reference_collection: str | None = ReferenceCollection.DEFAULT.value,
+                            reference_location_type: str | None = ReferenceLocationType.DEFAULT.value,
+                            reference_sequence: str | None = ReferenceSequence.DEFAULT.value,
+                            variant_base_sequence: str | None = VariantBaseSequence.DEFAULT.value
                             ) -> VariantCollection:
         """
         Get all variants for a given gene symbol.
@@ -71,15 +71,15 @@ class PharmVarApi:
         return VariantCollection(data = result.data)
 
     def get_variants_by_allele(self, identifier: str,
-                                include_reference_variants: bool = False,
-                                include_retired_alleles: bool = False,
-                                include_retired_reference_sequences: bool = False,
-                                position: int = None,
-                                reference_base_sequence = None, 
-                                reference_collection = None,
-                                reference_location_type = None,
-                                reference_sequence = None,
-                                variant_base_sequence = None
+                                include_reference_variants: bool = IncludeReferenceVariants.DEFAULT.value,
+                                include_retired_alleles: bool = IncludeRetiredAlleles.DEFAULT.value,
+                                include_retired_reference_sequences: bool = IncludeRetiredReferenceSequences.DEFAULT.value,
+                                position: int | None = Position.DEFAULT.value,
+                                reference_base_sequence: str | None = ReferenceBaseSequence.DEFAULT.value,
+                                reference_collection: str | None = ReferenceCollection.DEFAULT.value,
+                                reference_location_type: str | None = ReferenceLocationType.DEFAULT.value,
+                                reference_sequence: str | None = ReferenceSequence.DEFAULT.value,
+                                variant_base_sequence: str | None = VariantBaseSequence.DEFAULT.value
                                ) -> VariantCollection:
         """
         Get all variants for a given identifier.
@@ -112,14 +112,14 @@ class PharmVarApi:
         return VariantCollection(data = result.data)
     
     def get_variants_by_rsid(self, rs_id: str,
-                            include_reference_variants: bool = False,
-                            include_retired_reference_sequences: bool = False,
-                            position: int = None,
-                            reference_base_sequence: str = None,
-                            reference_collection: str = "GRCh38",
-                            reference_location_type: str = None,
-                            reference_sequence: str = None,
-                            variant_base_sequence: str = None
+                            include_reference_variants: bool = IncludeReferenceVariants.DEFAULT.value,
+                            include_retired_reference_sequences: bool = IncludeRetiredReferenceSequences.DEFAULT.value,
+                            position: int | None = Position.DEFAULT.value,
+                            reference_base_sequence: str | None = ReferenceBaseSequence.DEFAULT.value,
+                            reference_collection: str | None = ReferenceCollection.DEFAULT.value,
+                            reference_location_type: str | None = ReferenceLocationType.DEFAULT.value,
+                            reference_sequence: str | None = ReferenceSequence.DEFAULT.value,
+                            variant_base_sequence: str | None = VariantBaseSequence.DEFAULT.value
                             ) -> VariantCollection:
         """
         Get all variants for a given rsID.
@@ -188,18 +188,18 @@ class PharmVarApi:
 
     def get_all_alleles(
             self,
-            exclude_sub_alleles: bool = False,
-            function: Optional[str] = None,
-            include_reference_variants: bool = False,
-            include_retired_alleles: bool = False,
-            include_retired_reference_sequences: bool = False,
-            min_evidence_level: Optional[str] = None,
-            position: Optional[int] = None,
-            reference_base_sequence: Optional[str] = None,
-            reference_collection: Optional[str] = None,
-            reference_location_type: Optional[str] = None,
-            reference_sequence: Optional[str] = None,
-            variant_base_sequence: Optional[str] = None
+            exclude_sub_alleles: bool = ExcludeSubAlleles.DEFAULT.value,
+            function: str | None = Function.DEFAULT.value,
+            include_reference_variants: bool = IncludeReferenceVariants.DEFAULT.value,
+            include_retired_alleles: bool = IncludeRetiredAlleles.DEFAULT.value,
+            include_retired_reference_sequences: bool = IncludeRetiredReferenceSequences.DEFAULT.value,
+            min_evidence_level: str | None = EvidenceLevel.DEFAULT.value,
+            position: int | None = Position.DEFAULT.value,
+            reference_base_sequence: str | None = ReferenceBaseSequence.DEFAULT.value,
+            reference_collection: str | None = ReferenceCollection.DEFAULT.value,
+            reference_location_type: str | None = ReferenceLocationType.DEFAULT.value,
+            reference_sequence: str | None = ReferenceSequence.DEFAULT.value,
+            variant_base_sequence: str | None = VariantBaseSequence.DEFAULT.value
         ) -> AlleleCollection:
             """
             Get all alleles from the PharmVar database with optional filtering parameters.
@@ -278,7 +278,7 @@ class PharmVarApi:
         #     params: Dictionary of parameters to validate
             
         # Raises:
-        #     ValueError: If a parameter has an invalid value
+        #     ParameterValidationError if any parameter is invalid
         # """
     # Map from API parameter names (with hyphens) to their validation rules
         validation_rules = {
