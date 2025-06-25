@@ -1,6 +1,6 @@
 from typing import List, Dict, Optional, Any
-from enums.enums import Function, EvidenceLevel, ReferenceBase, ReferenceCollection, ReferenceLocationType, FilterError
-from exceptions.exceptions import ValidationError
+from enums.enums import Function, EvidenceLevel, ReferenceCollection, ReferenceLocationType, FilterError
+# from exceptions.exceptions import ValidationError
 from .base_collection import BaseCollection
 
 class Result:
@@ -180,7 +180,8 @@ class Allele:
                  references: List[Dict] = None,
                  url: str = None,
                  variantGroups: List[Dict] = None,
-                 variants: List[Dict] = None):
+                 variants: List[Dict] = None,
+                 activityScore: int = None):
         
         self.active_ind = activeInd
         self.allele_name = alleleName
@@ -197,6 +198,7 @@ class Allele:
         self.url = url
         self.variant_groups = VariantGroupCollection(variantGroups if variantGroups else [])
         self.variants = VariantCollection(variants if variants else [])
+        self.activity_score = activityScore
 
     def __repr__(self) -> str:
         return (f"Allele(allele_name={self.allele_name}, "
@@ -229,4 +231,4 @@ class AlleleCollection(BaseCollection):
         return iter(self.alleles)
 
     def __repr__(self) -> str:
-        return f"AlleleList(alleles={self.alleles})"
+        return f"{self.alleles}"
