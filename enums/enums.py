@@ -15,7 +15,7 @@ class EvidenceLevel(str, Enum):
     LIMITED = "Limited"
     MODERATE = "Moderate"
 
-class ReferenceBase(str, Enum):
+class ReferenceBaseSequence(str, Enum):
     A = "A"
     C = "C"
     G = "G"
@@ -30,6 +30,16 @@ class ReferenceCollection(str, Enum):
 class ReferenceLocationType(str, Enum):
     ATG_START = "ATG Start"
     SEQUENCE_START = "Sequence Start"
+
+class VariantBaseSequence(str, Enum):
+    A = "A"
+    C = "C"
+    G = "G"
+    T = "T"
+
+class ReferenceSequence(str, Enum):
+    # too many possibilities
+    pass
 
 class FilterError(Enum):
     INVALID_ATTRS = "Invalid attribute(s): {}"

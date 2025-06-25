@@ -1,9 +1,10 @@
-from typing import Optional
+from typing import Optional, Dict
 import logging
 from exceptions.exceptions import InvalidArgumentError
 from api import RestAdapter, VariantEndpoint, AlleleEndPoint
 from models import Variant, VariantCollection, AlleleCollection
 from config import APIConfig
+from enums.enums import QueryParameters
 class PharmVarApi:
     """
     PharmVarApi is a class that provides methods to interact with the PharmVar API.
@@ -54,14 +55,14 @@ class PharmVarApi:
         """
 
         params = {
-            "include-reference-variants": include_reference_variants,
-            "include-retired-reference-sequences": include_retired_reference_sequences,
-            "position": position,
-            "reference-base-sequence": reference_base_sequence,
-            "reference-collection": reference_collection,
-            "reference-location-type": reference_location_type,
-            "reference-sequence": reference_sequence,
-            "variant-base-sequence": variant_base_sequence
+            QueryParameters.INCLUDE_REFERENCE_VARIANTS: include_reference_variants,
+            QueryParameters.INCLUDE_RETIRED_REFERENCE_SEQUENCES: include_retired_reference_sequences,
+            QueryParameters.POSITION: position,
+            QueryParameters.REFERENCE_BASE_SEQUENCE: reference_base_sequence,
+            QueryParameters.REFERENCE_COLLECTION: reference_collection,
+            QueryParameters.REFERENCE_LOCATION_TYPE: reference_location_type,
+            QueryParameters.REFERENCE_SEQUENCE: reference_sequence,
+            QueryParameters.VARIANT_BASE_SEQUENCE: variant_base_sequence
         }
 
 
@@ -95,19 +96,19 @@ class PharmVarApi:
         :return: VariantCollection object containing all variants for the identifier.
         """
         params = {
-            "include-reference-variants": include_reference_variants,
-            "include-retired-alleles": include_retired_alleles,
-            "include-retired-reference-sequences": include_retired_reference_sequences,
-            "position": position,
-            "reference-base-sequence": reference_base_sequence,
-            "reference-collection": reference_collection,
-            "reference-location-type": reference_location_type,
-            "reference-sequence": reference_sequence,
-            "variant-base-sequence": variant_base_sequence
+            QueryParameters.INCLUDE_REFERENCE_VARIANTS.value: include_reference_variants,
+            QueryParameters.INCLUDE_RETIRED_ALLELES.value: include_retired_alleles,
+            QueryParameters.INCLUDE_RETIRED_REFERENCE_SEQUENCES.value: include_retired_reference_sequences,
+            QueryParameters.POSITION.value: position,
+            QueryParameters.REFERENCE_BASE_SEQUENCE.value: reference_base_sequence,
+            QueryParameters.REFERENCE_COLLECTION.value: reference_collection,
+            QueryParameters.REFERENCE_LOCATION_TYPE.value: reference_location_type,
+            QueryParameters.REFERENCE_SEQUENCE.value: reference_sequence,
+            QueryParameters.VARIANT_BASE_SEQUENCE.value: variant_base_sequence
         }
 
         endpoint = VariantEndpoint.ALLELE.value.format(identifier = identifier)
-        result = self._rest_adapter._do(http_method = 'GET', endpoint = endpoint)
+        result = self._rest_adapter._do(http_method = 'GET', endpoint = endpoint, params = params)
         return VariantCollection(data = result.data)
     
     def get_variants_by_rsid(self, rs_id: str,
@@ -134,14 +135,14 @@ class PharmVarApi:
         :return: VariantCollection object containing all variants for the rsID
         """
         params = {
-            "include-reference-variants": include_reference_variants,
-            "include-retired-reference-sequences": include_retired_reference_sequences,
-            "position": position,
-            "reference-base-sequence": reference_base_sequence,
-            "reference-collection": reference_collection,
-            "reference-location-type": reference_location_type,
-            "reference-sequence": reference_sequence,
-            "variant-base-sequence": variant_base_sequence
+            QueryParameters.INCLUDE_REFERENCE_VARIANTS.value: include_reference_variants,
+            QueryParameters.INCLUDE_RETIRED_REFERENCE_SEQUENCES.value: include_retired_reference_sequences,
+            QueryParameters.POSITION.value: position,
+            QueryParameters.REFERENCE_BASE_SEQUENCE.value: reference_base_sequence,
+            QueryParameters.REFERENCE_COLLECTION.value: reference_collection,
+            QueryParameters.REFERENCE_LOCATION_TYPE.value: reference_location_type,
+            QueryParameters.REFERENCE_SEQUENCE.value: reference_sequence,
+            QueryParameters.VARIANT_BASE_SEQUENCE.value: variant_base_sequence
         }
 
         endpoint = VariantEndpoint.RSID.value.format(rsId = rs_id)
@@ -221,29 +222,29 @@ class PharmVarApi:
                 AlleleCollection: Collection of alleles matching the specified criteria
             """
             params = {
-                "exclude-sub-alleles": exclude_sub_alleles,
-                "include-reference-variants": include_reference_variants,
-                "include-retired-alleles": include_retired_alleles,
-                "include-retired-reference-sequences": include_retired_reference_sequences
+                QueryParameters.EXCLUDE_SUB_ALLELES.value: exclude_sub_alleles,
+                QueryParameters.INCLUDE_REFERENCE_VARIANTS.value: include_reference_variants,
+                QueryParameters.INCLUDE_RETIRED_ALLELES.value: include_retired_alleles,
+                QueryParameters.INCLUDE_RETIRED_REFERENCE_SEQUENCES.value: include_retired_reference_sequences
             }
 
             # Add optional parameters if they are provided
             if function:
-                params["function"] = function
+                params[QueryParameters.FUNCTION.value] = function
             if min_evidence_level:
-                params["min-evidence-level"] = min_evidence_level
+                params[QueryParameters.MIN_EVIDENCE_LEVEL.value] = min_evidence_level
             if position:
-                params["position"] = position
+                params[QueryParameters.POSITION.value] = position
             if reference_base_sequence:
-                params["reference-base-sequence"] = reference_base_sequence
+                params[QueryParameters.REFERENCE_BASE_SEQUENCE.value] = reference_base_sequence
             if reference_collection:
-                params["reference-collection"] = reference_collection
+                params[QueryParameters.REFERENCE_COLLECTION.value] = reference_collection
             if reference_location_type:
-                params["reference-location-type"] = reference_location_type
+                params[QueryParameters.REFERENCE_LOCATION_TYPE.value] = reference_location_type
             if reference_sequence:
-                params["reference-sequence"] = reference_sequence
+                params[QueryParameters.REFERENCE_SEQUENCE.value] = reference_sequence
             if variant_base_sequence:
-                params["variant-base-sequence"] = variant_base_sequence
+                params[QueryParameters.VARIANT_BASE_SEQUENCE.value] = variant_base_sequence
 
             result = self._rest_adapter._do(
                 http_method='GET', 
@@ -252,3 +253,69 @@ class PharmVarApi:
             )
             
             return AlleleCollection(data=result.data)
+    
+    # Gene methods
+
+    # other methods
+    # def _validate_parameters(self, **kwargs):
+    #     """
+    #     Validate the parameters passed to the method.
+    #     :param kwargs: A dictionary of keyword arguments
+    #     :return: None
+    #     """
+    #     valid_attrs = self._get_items()[0].__dict__.keys()
+    #     invalid_attrs = [k for k in kwargs if k not in valid_attrs]
+    #     if invalid_attrs:
+    #         raise ValidationError(f"Invalid attribute {invalid_attrs} for {self._validate_parameters.__name__}")
+
+
+
+    def _validate_parameters(self, params: Dict):
+        """
+        # Validate API parameters before making requests
+        
+        # Args:
+        #     params: Dictionary of parameters to validate
+            
+        # Raises:
+        #     ValueError: If a parameter has an invalid value
+        # """
+    # Map from API parameter names (with hyphens) to their validation rules
+        validation_rules = {
+            "reference-collection": {
+                "valid_values": ["GRCh37", "GRCh38"],
+                "error_msg": "Invalid reference collection. Valid options are: GRCh37, GRCh38"
+            },
+            "reference-base-sequence": {
+                "valid_values": ["A", "C", "G", "T"],
+                "error_msg": "Invalid reference base sequence. Valid options are: A, C, G, T"
+            },
+            "variant-base-sequence": {
+                "valid_values": ["A", "C", "G", "T"],
+                "error_msg": "Invalid variant base sequence. Valid options are: A, C, G, T"
+            },
+            "position": {
+                "validator": lambda x: isinstance(x, int) and x > 0 if x is not None else True,
+                "error_msg": "Position must be a positive integer"
+            }
+        }
+        
+        # Clean params by removing None values
+        clean_params = {k: v for k, v in params.items() if v is not None}
+        
+        for param_name, param_value in clean_params.items():
+            # Skip validation for parameters not in our validation rules
+            if param_name not in validation_rules:
+                continue
+                
+            rule = validation_rules[param_name]
+            
+            # Check against valid values list if provided
+            if "valid_values" in rule and param_value is not None:
+                if param_value not in rule["valid_values"]:
+                    raise ValueError(rule["error_msg"])
+            
+            # Run custom validator function if provided
+            if "validator" in rule and param_value is not None:
+                if not rule["validator"](param_value):
+                    raise ValueError(rule["error_msg"])
