@@ -1,4 +1,3 @@
-from typing import Optional, Dict
 import logging
 from exceptions.exceptions import InvalidArgumentError
 from api import RestAdapter, VariantEndpoint, AlleleEndPoint
@@ -178,7 +177,7 @@ class PharmVarApi:
         :return: VariantCollection object containing the impact of the variant for the rsID
         """
         if rs_id is not None and spdi is not None:
-            raise InvalidArgumentError("Only one of rs_id or spdi can be provided, not both")
+            raise InvalidArgumentError("Either rs_id or spdi must be provided, not both.")
         if rs_id is not None:
             endpoint = VariantEndpoint.RSID_IMPACT.value.format(rsId=rs_id)
         elif spdi is not None:
@@ -186,7 +185,7 @@ class PharmVarApi:
         else:
             raise InvalidArgumentError("Either rs_id or spdi must be provided.")
 
-        result = self._rest_adapter._do(http_method = "GET", endpoint = endpoint, headers={"Accept": "*/*"})
+        result = self._rest_adapter._do(http_method = "GET", endpoint = endpoint, headers={"Accept": "*/*"}, params={})
         # Save in Variant instance with rs_id or spdi and impact
         variant = Variant(impact = result.data, rsId = rs_id,
                         referenceSequence = spdi.split(":")[0] if spdi else None,
@@ -194,6 +193,26 @@ class PharmVarApi:
                         )
         return variant.impact
     
+    def get_variant_frequency(self, *, rs_id: str = None, spdi: str = None) -> float:
+        """
+        Get the frequency of a variant for a given rsID or SPDI.
+        :param rs_id: The rsId of the variant
+        :param spdi: the SPDI designation of a variant: Reference Sequence:Position:Deletion:Insertion
+        :return: float representing the frequency of the variant for the rsID
+        """
+        if rs_id is not None and spdi is not None:
+            raise InvalidArgumentError("Either rs_id or spdi must be provided, not both.")
+        if rs_id is not None:
+            endpoint = VariantEndpoint.RSID_FREQUENCY.value.format(rsId=rs_id)
+        elif spdi is not None:
+            endpoint = VariantEndpoint.SPDI_FREQUENCY.value.format(spdi=spdi)
+        else:
+            raise InvalidArgumentError("Either rs_id or spdi must be provided.")
+
+        result = self._rest_adapter._do(http_method="GET", endpoint=endpoint)
+        frequency = result.data[0]["frequency"] if result.data else None
+        return frequency
+
         # Allele methods
 
     def get_all_alleles(
