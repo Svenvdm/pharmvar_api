@@ -44,7 +44,6 @@ class PharmVarApi:
         result = self._rest_adapter._do(http_method = 'GET', endpoint = VariantEndpoint.ALL.value, params = params)
         return VariantCollection(data = result.data)
 
-
     def get_variants_by_gene(self,
                             gene_symbol: str,
                             include_reference_variants: bool = IncludeReferenceVariants.DEFAULT.value,
@@ -69,7 +68,6 @@ class PharmVarApi:
         :param variant_base_sequence: Filter by observed variant base sequence (A, C, G, T).
         :return: VariantCollection object containing all variants for the gene
         """
-
         params = {
             QueryParameters.INCLUDE_REFERENCE_VARIANTS: include_reference_variants,
             QueryParameters.INCLUDE_RETIRED_REFERENCE_SEQUENCES: include_retired_reference_sequences,
@@ -80,7 +78,6 @@ class PharmVarApi:
             QueryParameters.REFERENCE_SEQUENCE: reference_sequence,
             QueryParameters.VARIANT_BASE_SEQUENCE: variant_base_sequence
         }
-
 
         endpoint = VariantEndpoint.GENE.value.format(symbol = gene_symbol)
         result = self._rest_adapter._do(http_method = 'GET', endpoint = endpoint, params = params)
@@ -122,7 +119,6 @@ class PharmVarApi:
             QueryParameters.REFERENCE_SEQUENCE.value: reference_sequence,
             QueryParameters.VARIANT_BASE_SEQUENCE.value: variant_base_sequence
         }
-
         endpoint = VariantEndpoint.ALLELE.value.format(identifier = identifier)
         result = self._rest_adapter._do(http_method = 'GET', endpoint = endpoint, params = params)
         return VariantCollection(data = result.data)
@@ -160,7 +156,6 @@ class PharmVarApi:
             QueryParameters.REFERENCE_SEQUENCE.value: reference_sequence,
             QueryParameters.VARIANT_BASE_SEQUENCE.value: variant_base_sequence
         }
-
         endpoint = VariantEndpoint.RSID.value.format(rsId = rs_id)
         result = self._rest_adapter._do(http_method = 'GET', endpoint = endpoint, params = params)
         return VariantCollection(data = result.data)
@@ -184,7 +179,6 @@ class PharmVarApi:
         """
         if rs_id is not None and spdi is not None:
             raise InvalidArgumentError("Only one of rs_id or spdi can be provided, not both")
-
         if rs_id is not None:
             endpoint = VariantEndpoint.RSID_IMPACT.value.format(rsId=rs_id)
         elif spdi is not None:
@@ -241,33 +235,16 @@ class PharmVarApi:
                 QueryParameters.EXCLUDE_SUB_ALLELES.value: exclude_sub_alleles,
                 QueryParameters.INCLUDE_REFERENCE_VARIANTS.value: include_reference_variants,
                 QueryParameters.INCLUDE_RETIRED_ALLELES.value: include_retired_alleles,
-                QueryParameters.INCLUDE_RETIRED_REFERENCE_SEQUENCES.value: include_retired_reference_sequences
+                QueryParameters.INCLUDE_RETIRED_REFERENCE_SEQUENCES.value: include_retired_reference_sequences,
+                QueryParameters.MIN_EVIDENCE_LEVEL.value: min_evidence_level,
+                QueryParameters.POSITION.value: position,
+                QueryParameters.REFERENCE_BASE_SEQUENCE.value: reference_base_sequence,
+                QueryParameters.REFERENCE_COLLECTION.value: reference_collection,
+                QueryParameters.REFERENCE_LOCATION_TYPE.value: reference_location_type,
+                QueryParameters.REFERENCE_SEQUENCE.value: reference_sequence,
+                QueryParameters.VARIANT_BASE_SEQUENCE.value: variant_base_sequence
             }
-
-            # Add optional parameters if they are provided
-            if function:
-                params[QueryParameters.FUNCTION.value] = function
-            if min_evidence_level:
-                params[QueryParameters.MIN_EVIDENCE_LEVEL.value] = min_evidence_level
-            if position:
-                params[QueryParameters.POSITION.value] = position
-            if reference_base_sequence:
-                params[QueryParameters.REFERENCE_BASE_SEQUENCE.value] = reference_base_sequence
-            if reference_collection:
-                params[QueryParameters.REFERENCE_COLLECTION.value] = reference_collection
-            if reference_location_type:
-                params[QueryParameters.REFERENCE_LOCATION_TYPE.value] = reference_location_type
-            if reference_sequence:
-                params[QueryParameters.REFERENCE_SEQUENCE.value] = reference_sequence
-            if variant_base_sequence:
-                params[QueryParameters.VARIANT_BASE_SEQUENCE.value] = variant_base_sequence
-
-            result = self._rest_adapter._do(
-                http_method='GET', 
-                endpoint=AlleleEndPoint.ALL.value,
-                params=params
-            )
-            
+            result = self._rest_adapter._do(http_method='GET', endpoint=AlleleEndPoint.ALL.value, params=params)
             return AlleleCollection(data=result.data)
     
     # Gene methods
