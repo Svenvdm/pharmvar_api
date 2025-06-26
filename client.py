@@ -252,6 +252,7 @@ class PharmVarApi:
             """
             params = {
                 QueryParameters.EXCLUDE_SUB_ALLELES.value: exclude_sub_alleles,
+                QueryParameters.FUNCTION.value: function,
                 QueryParameters.INCLUDE_REFERENCE_VARIANTS.value: include_reference_variants,
                 QueryParameters.INCLUDE_RETIRED_ALLELES.value: include_retired_alleles,
                 QueryParameters.INCLUDE_RETIRED_REFERENCE_SEQUENCES.value: include_retired_reference_sequences,
