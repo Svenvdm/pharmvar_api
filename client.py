@@ -15,17 +15,33 @@ class PharmVarApi:
     def __init__(self, hostname: str = APIConfig.DEFAULT_HOST, api_key: str = '', ver: str = APIConfig.DEFAULT_VERSION, logger: logging.Logger = APIConfig.DEFAULT_LOGGER):
         self._rest_adapter = RestAdapter(hostname, api_key, ver, logger)
     
-    # Variant methods
+    ###### Variant methods ######
 
-    def get_all_variants(self) -> VariantCollection:
-
-        ### TODO: add parameters
+    def get_all_variants(self,
+                         include_reference_variants: bool = IncludeReferenceVariants.DEFAULT.value,
+                         include_retired_reference_sequences: bool = IncludeRetiredReferenceSequences.DEFAULT.value,
+                         position: int | None = Position.DEFAULT.value,
+                         reference_base_sequence: str | None = ReferenceBaseSequence.DEFAULT.value,
+                         reference_collection: str | None = ReferenceCollection.DEFAULT.value,
+                         reference_location_type: str | None = ReferenceLocationType.DEFAULT.value,
+                         reference_sequence: str | None = ReferenceSequence.DEFAULT.value,
+                         variant_base_sequence: str | None = VariantBaseSequence.DEFAULT.value
+                         ) -> VariantCollection:
         """
         Get all variants from the PharmVar database.
         return: VariantCollection object containing all variants
         """
-
-        result = self._rest_adapter._do(http_method = 'GET', endpoint = VariantEndpoint.ALL.value)
+        params = {
+            QueryParameters.INCLUDE_REFERENCE_VARIANTS: include_reference_variants,
+            QueryParameters.INCLUDE_RETIRED_REFERENCE_SEQUENCES: include_retired_reference_sequences,
+            QueryParameters.POSITION: position,
+            QueryParameters.REFERENCE_BASE_SEQUENCE: reference_base_sequence,
+            QueryParameters.REFERENCE_COLLECTION: reference_collection,
+            QueryParameters.REFERENCE_LOCATION_TYPE: reference_location_type,
+            QueryParameters.REFERENCE_SEQUENCE: reference_sequence,
+            QueryParameters.VARIANT_BASE_SEQUENCE: variant_base_sequence
+        }
+        result = self._rest_adapter._do(http_method = 'GET', endpoint = VariantEndpoint.ALL.value, params = params)
         return VariantCollection(data = result.data)
 
 
