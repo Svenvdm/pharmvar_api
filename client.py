@@ -31,14 +31,14 @@ class PharmVarApi:
         return: VariantCollection object containing all variants
         """
         params = {
-            QueryParameters.INCLUDE_REFERENCE_VARIANTS: include_reference_variants,
-            QueryParameters.INCLUDE_RETIRED_REFERENCE_SEQUENCES: include_retired_reference_sequences,
-            QueryParameters.POSITION: position,
-            QueryParameters.REFERENCE_BASE_SEQUENCE: reference_base_sequence,
-            QueryParameters.REFERENCE_COLLECTION: reference_collection,
-            QueryParameters.REFERENCE_LOCATION_TYPE: reference_location_type,
-            QueryParameters.REFERENCE_SEQUENCE: reference_sequence,
-            QueryParameters.VARIANT_BASE_SEQUENCE: variant_base_sequence
+            QueryParameters.INCLUDE_REFERENCE_VARIANTS.value: include_reference_variants,
+            QueryParameters.INCLUDE_RETIRED_REFERENCE_SEQUENCES.value: include_retired_reference_sequences,
+            QueryParameters.POSITION.value: position,
+            QueryParameters.REFERENCE_BASE_SEQUENCE.value: reference_base_sequence,
+            QueryParameters.REFERENCE_COLLECTION.value: reference_collection,
+            QueryParameters.REFERENCE_LOCATION_TYPE.value: reference_location_type,
+            QueryParameters.REFERENCE_SEQUENCE.value: reference_sequence,
+            QueryParameters.VARIANT_BASE_SEQUENCE.value: variant_base_sequence
         }
         result = self._rest_adapter._do(http_method = 'GET', endpoint = VariantEndpoint.ALL.value, params = params)
         return VariantCollection(data = result.data)
@@ -68,14 +68,14 @@ class PharmVarApi:
         :return: VariantCollection object containing all variants for the gene
         """
         params = {
-            QueryParameters.INCLUDE_REFERENCE_VARIANTS: include_reference_variants,
-            QueryParameters.INCLUDE_RETIRED_REFERENCE_SEQUENCES: include_retired_reference_sequences,
-            QueryParameters.POSITION: position,
-            QueryParameters.REFERENCE_BASE_SEQUENCE: reference_base_sequence,
-            QueryParameters.REFERENCE_COLLECTION: reference_collection,
-            QueryParameters.REFERENCE_LOCATION_TYPE: reference_location_type,
-            QueryParameters.REFERENCE_SEQUENCE: reference_sequence,
-            QueryParameters.VARIANT_BASE_SEQUENCE: variant_base_sequence
+            QueryParameters.INCLUDE_REFERENCE_VARIANTS.value: include_reference_variants,
+            QueryParameters.INCLUDE_RETIRED_REFERENCE_SEQUENCES.value: include_retired_reference_sequences,
+            QueryParameters.POSITION.value: position,
+            QueryParameters.REFERENCE_BASE_SEQUENCE.value: reference_base_sequence,
+            QueryParameters.REFERENCE_COLLECTION.value: reference_collection,
+            QueryParameters.REFERENCE_LOCATION_TYPE.value: reference_location_type,
+            QueryParameters.REFERENCE_SEQUENCE.value: reference_sequence,
+            QueryParameters.VARIANT_BASE_SEQUENCE.value: variant_base_sequence
         }
 
         endpoint = VariantEndpoint.GENE.value.format(symbol = gene_symbol)
@@ -264,8 +264,12 @@ class PharmVarApi:
                 QueryParameters.REFERENCE_SEQUENCE.value: reference_sequence,
                 QueryParameters.VARIANT_BASE_SEQUENCE.value: variant_base_sequence
             }
-            result = self._rest_adapter._do(http_method='GET', endpoint=AlleleEndPoint.ALL.value, params=params)
+            # print(f"Params for get_all_alleles: {}")
+            result = self._rest_adapter._do(http_method='GET', endpoint=AlleleEndPoint.ALL.value)
             return AlleleCollection(data=result.data)
     
-    # Gene methods
+
+
+
+    ##### Gene methods #####
 
