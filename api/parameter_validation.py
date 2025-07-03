@@ -10,6 +10,11 @@ def validate_parameters(function):
     """
     @wraps(function)
     def wrapper(*args, **kwargs):
+
+        # Check if 'params' is in kwargs
+        if "params" not in kwargs:
+            return function(*args, **kwargs)  # No params to validate, just call the function
+            
         params = kwargs["params"]
         clean_params = {k: v for k, v in params.items() if v is not None}
 
