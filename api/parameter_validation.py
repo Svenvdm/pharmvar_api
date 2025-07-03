@@ -1,8 +1,8 @@
-## decorator for parameter validation
 from functools import wraps
 from enums.enums import ValidationRule
 from exceptions.exceptions import ParameterValidationError
 
+# Decorator for parameter validation
 def validate_parameters(function):
     """
     Decorator to validate parameters passed to the API request.
@@ -10,17 +10,7 @@ def validate_parameters(function):
     """
     @wraps(function)
     def wrapper(*args, **kwargs):
-        params = None
-        if 'params' in kwargs:
-            params = kwargs['params']
-        elif args and isinstance(args[0], dict):
-            params = args[0]
-        elif len(args) > 1 and isinstance(args[1], dict):  # For methods with self
-            params = args[1]
-
-        if not params:
-            raise ValueError("No parameters provided for validation")
-        
+        params = kwargs["params"]
         clean_params = {k: v for k, v in params.items() if v is not None}
 
         for param_name, param_value in clean_params.items():
@@ -34,4 +24,7 @@ def validate_parameters(function):
                 if "validator" in rule and param_value is not None:
                     if not rule["validator"](param_value):
                         raise ParameterValidationError(parameter=param_name, value=param_value, message=rule["error_message"])
+        # Call the original function if all validations pass
+        return function(*args, **kwargs)
+                    
     return wrapper

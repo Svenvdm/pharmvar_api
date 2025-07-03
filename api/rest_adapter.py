@@ -1,11 +1,11 @@
 import logging
 import requests
-import requests.packages
-from typing import List, Dict
+from typing import Dict
 from exceptions.exceptions import PharmVarApiException, NoDataFoundError
 from models import Result
 from json import JSONDecodeError
 from config import APIConfig
+from .parameter_validation import validate_parameters
 
 
 class RestAdapter:
@@ -22,7 +22,8 @@ class RestAdapter:
         self._logger = logger or logging.getLogger(__name__)
         self._version = version
 
-    def _do(self, http_method: str, endpoint: str, params: Dict = None, data: Dict = None, headers: Dict = {"Accept": "*/*"}) -> Result:
+    @validate_parameters
+    def _do(self, http_method: str, endpoint: str, params: Dict = None, data: Dict = None, headers: Dict = {"Accept": "*/*"}, verify = False) -> Result:
         """
         Execute HTTP request with logging and error handling
         
@@ -44,13 +45,15 @@ class RestAdapter:
         log_line_pre = f"method={http_method}, url={full_url}, params={params}"
         
         try:
+            # temporarily disable ssl verification for 
             self._logger.debug(msg=log_line_pre)   
             response = requests.request(
                 method=http_method,
                 url=full_url,
                 headers=headers,
                 params=params,
-                data=data
+                data=data,
+                verify=verify
             )
         except requests.exceptions.RequestException as e:
             self._logger.error(msg=str(e))
