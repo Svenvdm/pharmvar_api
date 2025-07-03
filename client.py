@@ -40,8 +40,9 @@ class PharmVarApi:
             QueryParameters.REFERENCE_SEQUENCE.value: reference_sequence,
             QueryParameters.VARIANT_BASE_SEQUENCE.value: variant_base_sequence
         }
-        result = self._rest_adapter._do(http_method = 'GET', endpoint = VariantEndpoint.ALL.value, params = params)
-        return VariantCollection(data = result.data)
+        endpoint = VariantEndpoint.ALL.value
+        result = self._rest_adapter._do(http_method='GET', endpoint=endpoint, params=params)
+        return VariantCollection(data=result.data)
 
     def get_variants_by_gene(self,
                             gene_symbol: str,
@@ -264,12 +265,203 @@ class PharmVarApi:
                 QueryParameters.REFERENCE_SEQUENCE.value: reference_sequence,
                 QueryParameters.VARIANT_BASE_SEQUENCE.value: variant_base_sequence
             }
-            # print(f"Params for get_all_alleles: {}")
-            result = self._rest_adapter._do(http_method='GET', endpoint=AlleleEndPoint.ALL.value)
+            endpoint = AlleleEndPoint.ALL.value
+            result = self._rest_adapter._do(http_method='GET', endpoint=endpoint, params=params)
+            return AlleleCollection(data=result.data)
+
+    def get_all_active_alleles(
+            self
+        ) -> AlleleCollection:
+            """
+            Get all active alleles from the PharmVar database.
+            Returns:
+                AlleleCollection: Collection of all active alleles
+            """
+            endpoint = AlleleEndPoint.ACTIVE.value
+            result = self._rest_adapter._do(http_method='GET', endpoint=endpoint)
             return AlleleCollection(data=result.data)
     
+    def get_allele_by_identifier(
+            self, identifier: str,
+            exclude_sub_alleles: bool = ExcludeSubAlleles.DEFAULT.value,
+            function: str | None = Function.DEFAULT.value,
+            include_reference_variants: bool = IncludeReferenceVariants.DEFAULT.value,
+            include_retired_alleles: bool = IncludeRetiredAlleles.DEFAULT.value,
+            include_retired_reference_sequences: bool = IncludeRetiredReferenceSequences.DEFAULT.value,
+            min_evidence_level: str | None = EvidenceLevel.DEFAULT.value,
+            position: int | None = Position.DEFAULT.value,
+            reference_base_sequence: str | None = ReferenceBaseSequence.DEFAULT.value,
+            reference_collection: str | None = ReferenceCollection.DEFAULT.value,
+            reference_location_type: str | None = ReferenceLocationType.DEFAULT.value,
+            reference_sequence: str | None = ReferenceSequence.DEFAULT.value,
+            variant_base_sequence: str | None = VariantBaseSequence.DEFAULT.value
+        ) -> AlleleCollection:
+        """
+        Get an allele by its identifier (PV_ID or allele name).
+        :param identifier: The identifier of the allele (PV_ID or allele name). Make sure to use the full allele name, e.g., "CYP2D6*4.001".
+        :param exclude_sub_alleles: Exclude sub-allele definitions from results.
+        :param function: Filter results by function (decreased function, function not assigned, increased function, normal function, possibly decreased, severely decreased, uncertain function, unknown function).
+        :param include_reference_variants: Include reference variants like A>A or C>C. Default
+        is False.
+        :param include_retired_alleles: Include retired allele definitions from previous versions. Default
+        is False.
+        :param include_retired_reference_sequences: Include variants from retired reference sequences. Default is False
+        :param min_evidence_level: Filter by minimum evidence level (Definitive, Limited, Moderate).
+        :param position: Filter results by variant position.
+        :param reference_base_sequence: Filter by reference base sequence (A, C, G, T).
+        :param reference_collection: Filter by reference collection (GRCh37, GRCh38, etc.).
+        :param reference_location_type: Filter by reference starting location.
+        :param reference_sequence: Filter by reference sequence (e.g., "NG_008376.4").
+        :param variant_base_sequence: Filter by observed variant base sequence (A, C, G, T).
+        """
+        params = {
+            QueryParameters.IDENTIFIER.value: identifier,
+            QueryParameters.EXCLUDE_SUB_ALLELES.value: exclude_sub_alleles,
+            QueryParameters.FUNCTION.value: function,
+            QueryParameters.INCLUDE_REFERENCE_VARIANTS.value: include_reference_variants,
+            QueryParameters.INCLUDE_RETIRED_ALLELES.value: include_retired_alleles,
+            QueryParameters.INCLUDE_RETIRED_REFERENCE_SEQUENCES.value: include_retired_reference_sequences,
+            QueryParameters.MIN_EVIDENCE_LEVEL.value: min_evidence_level,
+            QueryParameters.POSITION.value: position,
+            QueryParameters.REFERENCE_BASE_SEQUENCE.value: reference_base_sequence,
+            QueryParameters.REFERENCE_COLLECTION.value: reference_collection,
+            QueryParameters.REFERENCE_LOCATION_TYPE.value: reference_location_type,
+            QueryParameters.REFERENCE_SEQUENCE.value: reference_sequence,
+            QueryParameters.VARIANT_BASE_SEQUENCE.value: variant_base_sequence
+        }
+        endpoint = AlleleEndPoint.IDENTIFIER.value.format(identifier=identifier)
+        result = self._rest_adapter._do(http_method='GET', endpoint=endpoint, params=params)
+        return AlleleCollection(data=result.data)
 
+    def get_allele_name(
+            self,
+            identifier: str,
+            include_retired_alleles: bool = IncludeRetiredAlleles.DEFAULT.value
+    ) -> str:
+        """
+        Get the allele name for a given identifier (PV_ID or allele name).
+        :param identifier: The identifier of the allele (PV_ID or allele name)
+        :param include_retired_alleles: Include retired allele definitions from previous versions. Default is False.
+        :return: The allele name
+        """
+        params = {
+            QueryParameters.IDENTIFIER.value: identifier,
+            QueryParameters.INCLUDE_RETIRED_ALLELES.value: include_retired_alleles
+        }
+        endpoint = AlleleEndPoint.ALLELE_NAME.value.format(identifier=identifier)
+        result = self._rest_adapter._do(http_method='GET', endpoint=endpoint, params=params)
+        return result.data
+    
+    def get_allele_evidence_level(
+            self,
+            identifier: str,
+            include_retired_alleles: bool = IncludeRetiredAlleles.DEFAULT.value
+    ) -> str:
+        """
+        Get the evidence level for a given allele identifier (PV_ID or allele name).
+        :param identifier: The identifier of the allele (PV_ID or allele name). Make sure to use the full allele name, e.g., "CYP2D6*4.001".
+        :param include_retired_alleles: Include retired allele definitions from previous versions. Default is False.
+        :return: The evidence level of the allele
+        """
+        params = {
+            QueryParameters.IDENTIFIER.value: identifier,
+            QueryParameters.INCLUDE_RETIRED_ALLELES.value: include_retired_alleles
+        }
+        endpoint = AlleleEndPoint.EVIDENCE_LEVEL.value.format(identifier=identifier)
+        result = self._rest_adapter._do(http_method='GET', endpoint=endpoint, params=params)
+        return result.data
+    
+    def get_allele_function(
+            self,
+            identifier: str,
+            include_retired_alleles: bool = IncludeRetiredAlleles.DEFAULT.value
+    ) -> str:
+        """
+        Get the CPIC clinical function of an allele for a given identifier (PV_ID or allele name).
+        :param identifier: The identifier of the allele (PV_ID or allele name). Make sure to use the full allele name, e.g., "CYP2D6*4.001".
+        :param include_retired_alleles: Include retired allele definitions from previous versions. Default is False.
+        :return: The function of the allele
+        """
+        params = {
+            QueryParameters.IDENTIFIER.value: identifier,
+            QueryParameters.INCLUDE_RETIRED_ALLELES.value: include_retired_alleles
+        }
+        endpoint = AlleleEndPoint.function.value.format(identifier=identifier)
+        result = self._rest_adapter._do(http_method='GET', endpoint=endpoint, params=params)
+        return result.data
+    def get_allele_pv_id(
+            self,
+            identifier: str,
+            include_retired_alleles: bool = IncludeRetiredAlleles.DEFAULT.value
+    ) -> str:
+        """
+        Get the PV ID for a given allele identifier (PV_ID or allele name).
+        :param identifier: The identifier of the allele (PV_ID or allele name). Make sure to use the full allele name, e.g., "CYP2D6*4.001".
+        :param include_retired_alleles: Include retired allele definitions from previous versions. Default is False.
+        :return: The PV ID of the allele
+        """
+        params = {
+            QueryParameters.IDENTIFIER.value: identifier,
+            QueryParameters.INCLUDE_RETIRED_ALLELES.value: include_retired_alleles
+        }
+        endpoint = AlleleEndPoint.PV_ID.value.format(identifier=identifier)
+        result = self._rest_adapter._do(http_method='GET', endpoint=endpoint, params=params)
+        return result.data
+    
+    def get_allele_references(
+            self,
+            identifier: str,
+            include_retired_alleles: bool = IncludeRetiredAlleles.DEFAULT.value
+    ) -> list:
+        """
+        Get the references for a given allele identifier (PV_ID or allele name).
+        :param identifier: The identifier of the allele (PV_ID or allele name). Make sure to use the full allele name, e.g., "CYP2D6*4.001".
+        :param include_retired_alleles: Include retired allele definitions from previous versions. Default is False.
+        :return: List of references for the allele
+        """
+        params = {
+            QueryParameters.IDENTIFIER.value: identifier,
+            QueryParameters.INCLUDE_RETIRED_ALLELES.value: include_retired_alleles
+        }
+        endpoint = AlleleEndPoint.REFERENCES.value.format(identifier=identifier)
+        result = self._rest_adapter._do(http_method='GET', endpoint=endpoint, params=params)
+        return result.data
 
-
+    def get_allele_variants(
+            self,
+            identifier: str,
+            include_reference_variants: bool = IncludeReferenceVariants.DEFAULT.value,
+            include_retired_alleles: bool = IncludeRetiredAlleles.DEFAULT.value,
+            include_retired_reference_sequences: bool = IncludeRetiredReferenceSequences.DEFAULT.value, 
+            position: int | None = Position.DEFAULT.value,
+            reference_base_sequence: str | None = ReferenceBaseSequence.DEFAULT.value,
+            reference_collection: str | None = ReferenceCollection.DEFAULT.value,
+            reference_location_type: str | None = ReferenceLocationType.DEFAULT.value,
+            reference_sequence: str | None = ReferenceSequence.DEFAULT.value,
+            variant_base_sequence: str | None = VariantBaseSequence.DEFAULT.value
+    ) -> VariantCollection:
+        """
+        Get the variants for a given allele identifier (PV_ID or allele name).
+        :param identifier: The identifier of the allele (PV_ID or allele name). Make sure to use the full allele name, e.g., "CYP2D6*4.001".
+        :param include_retired_alleles: Include retired allele definitions from previous versions. Default is False.
+        :return: VariantCollection object containing all variants for the allele
+        """
+        params = {
+            QueryParameters.IDENTIFIER.value: identifier,
+            QueryParameters.INCLUDE_RETIRED_ALLELES.value: include_retired_alleles,
+            QueryParameters.INCLUDE_REFERENCE_VARIANTS.value: include_reference_variants,
+            QueryParameters.INCLUDE_RETIRED_REFERENCE_SEQUENCES.value: include_retired_reference_sequences,
+            QueryParameters.POSITION.value: position,
+            QueryParameters.REFERENCE_BASE_SEQUENCE.value: reference_base_sequence,
+            QueryParameters.REFERENCE_COLLECTION.value: reference_collection,
+            QueryParameters.REFERENCE_LOCATION_TYPE.value: reference_location_type,
+            QueryParameters.REFERENCE_SEQUENCE.value: reference_sequence,
+            QueryParameters.VARIANT_BASE_SEQUENCE.value: variant_base_sequence
+        }
+        endpoint = AlleleEndPoint.VARIANTS.value.format(identifier=identifier)
+        result = self._rest_adapter._do(http_method='GET', endpoint=endpoint, params=params)
+        return VariantCollection(data=result.data)
+        
     ##### Gene methods #####
+
 
