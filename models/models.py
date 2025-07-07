@@ -1,6 +1,4 @@
-from typing import List, Dict, Optional, Any
-from enums.enums import Function, EvidenceLevel, ReferenceCollection, ReferenceLocationType, FilterError
-# from exceptions.exceptions import ValidationError
+from typing import List, Dict
 from .base_collection import BaseCollection
 
 class Result:
@@ -232,3 +230,60 @@ class AlleleCollection(BaseCollection):
 
     def __repr__(self) -> str:
         return f"{self.alleles}"
+    
+class Gene(BaseCollection):
+    """
+    A representation of a PharmVar Gene
+
+    Args:
+        entrezId (str): The Entrez Gene ID
+        hgncId (str): The HGNC ID
+        name (str): The gene name
+        symbol (str): The gene symbol
+        pharmgkbId (str): The PharmGKB ID
+        alleles (AlleleCollection): List of alleles associated with the gene
+    """
+    def __init__(self,
+                 entrezGeneId: str = None,
+                 hgncId: str = None,
+                 geneName: str = None,
+                 geneSymbol: str = None,
+                 pharmgkbId: str = None,
+                 alleles: AlleleCollection = None,
+                 ):
+        self.entrez_id = entrezGeneId
+        self.hgnc_id = hgncId
+        self.gene_name = geneName
+        self.gene_symbol = geneSymbol
+        self.pharmgkb_id = pharmgkbId
+        self.alleles = AlleleCollection(alleles) if alleles else AlleleCollection()
+
+    def __repr__(self) -> str:
+        return f"Gene(gene_symbol={self.gene_symbol}, entrez_id={self.entrez_id})"
+
+    def __get_items__(self):
+        return self.__dict__.items()
+    
+class GeneCollection(BaseCollection):
+    """
+    Represents a collection of Gene objects
+    """
+    def __init__(self, data: List[Dict] = None):
+        if not data:
+            data = []
+        self.genes = [Gene(**gene) if isinstance(gene, dict) else gene for gene in data]
+
+    def _get_items(self):
+        return self.genes
+
+    def __len__(self) -> int:
+        return len(self.genes)
+
+    def __getitem__(self, index: int):
+        return self.genes[index]
+
+    def __iter__(self):
+        return iter(self.genes)
+
+    def __repr__(self) -> str:
+        return f"GeneCollection(genes={self.genes})"
