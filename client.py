@@ -214,7 +214,7 @@ class PharmVarApi:
         frequency = result.data[0]["frequency"] if result.data else None
         return frequency
 
-        # Allele methods
+        ###### Allele methods ######
 
     def get_all_alleles(
             self,
@@ -464,7 +464,6 @@ class PharmVarApi:
     
     ##### Gene methods #####
 
-    # Need to first create the GENE model and GeneCollection model!
     def get_info_all_genes(
             self,
             exclude_sub_alleles: bool = ExcludeSubAlleles.DEFAULT.value,

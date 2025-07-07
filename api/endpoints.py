@@ -29,6 +29,3 @@ class GeneEndPoint(Enum):
     LIST = "genes/list"
     PHARMGKB = "genes/pharmgkb/{pharmgkbId}"
     SYMBOL = "genes/{symbol}"
-
-    
-
