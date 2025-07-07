@@ -80,6 +80,8 @@ class FilterError(BaseEnum):
 
 class QueryParameters(BaseEnum):
     GENE_SYMBOL = "gene-symbol"
+    HGNC = "hgnc"
+    PHARMGKB = "pharmgkb"
     IDENTIFIER = "identifier"
     EXCLUDE_SUB_ALLELES = "exclude-sub-alleles"
     FUNCTION = "function"
