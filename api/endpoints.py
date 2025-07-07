@@ -11,7 +11,6 @@ class VariantEndpoint(Enum):
     SPDI_IMPACT = "variants/spdi/{spdi}/impact"
     SPDI_FREQUENCY = "variants/spdi/{spdi}/variant-frequency"
 
-
 class AlleleEndPoint(Enum):
     ALL = "alleles"
     ACTIVE = "alleles/list"
@@ -23,4 +22,13 @@ class AlleleEndPoint(Enum):
     REFERENCES = "alleles/{identifier}/references"
     VARIANTS = "alleles/{identifier}/variants"
 
+class GeneEndPoint(Enum):
+    GENES = "genes"
+    ENTREZ_ID = "genes/entrez-gene/{entrezId}"
+    HGNC = "genes/hgnc/{hgncId}"
+    LIST = "genes/list"
+    PHARMGKB = "genes/pharmgkb/{pharmgkbId}"
+    SYMBOL = "genes/{symbol}"
+
+    
 
