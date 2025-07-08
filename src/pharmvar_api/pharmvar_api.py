@@ -1,8 +1,9 @@
 import logging
 from .exceptions import InvalidArgumentError
-from .api import RestAdapter, VariantEndpoint, AlleleEndPoint, GeneEndPoint
+from .api import RestAdapter
 from .models import Variant, VariantCollection, AlleleCollection, Gene, GeneCollection
-from config import APIConfig
+from .api import AlleleEndPoint, GeneEndPoint, VariantEndpoint
+from .config import APIConfig
 from .enums import QueryParameters, IncludeReferenceVariants, IncludeRetiredAlleles, IncludeRetiredReferenceSequences, Function, EvidenceLevel, ReferenceBaseSequence, ReferenceCollection, ReferenceLocationType, VariantBaseSequence, Position, ReferenceSequence, ExcludeSubAlleles
 class PharmVarApi:
     """

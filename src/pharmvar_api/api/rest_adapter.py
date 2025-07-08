@@ -1,11 +1,11 @@
 import logging
 import requests
+from json import JSONDecodeError
 from typing import Dict
 from ..exceptions import PharmVarApiException, NoDataFoundError
 from ..models import Result
-from json import JSONDecodeError
-from config import APIConfig
-from ..utils.parameter_validation import validate_parameters
+from ..config import APIConfig
+from ..utils import validate_parameters
 
 class RestAdapter:
     def __init__(self, hostname: str = APIConfig.DEFAULT_HOST , api_key: str = APIConfig.DEFAULT_API_KEY, version: str = APIConfig.DEFAULT_VERSION, logger: logging.Logger = APIConfig.DEFAULT_LOGGER):
