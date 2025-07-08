@@ -1,15 +1,14 @@
 import logging
 import requests
 from typing import Dict
-from exceptions.exceptions import PharmVarApiException, NoDataFoundError
-from models import Result
+from ..exceptions import PharmVarApiException, NoDataFoundError
+from ..models import Result
 from json import JSONDecodeError
 from config import APIConfig
-from .parameter_validation import validate_parameters
-
+from ..utils.parameter_validation import validate_parameters
 
 class RestAdapter:
-    def __init__(self, hostname: str = APIConfig.DEFAULT_HOST , api_key: str = "", version: str = APIConfig.DEFAULT_VERSION, logger: logging.Logger = APIConfig.DEFAULT_LOGGER):
+    def __init__(self, hostname: str = APIConfig.DEFAULT_HOST , api_key: str = APIConfig.DEFAULT_API_KEY, version: str = APIConfig.DEFAULT_VERSION, logger: logging.Logger = APIConfig.DEFAULT_LOGGER):
         """
         :param hostname: The hostname of the API server: e.g. www.pharmvar.org/api-service
         :param api_key (optional): The API key to use for authentication
@@ -23,7 +22,7 @@ class RestAdapter:
         self._version = version
 
     @validate_parameters
-    def _do(self, http_method: str, endpoint: str, params: Dict = None, data: Dict = None, headers: Dict = {"Accept": "*/*"}, verify = True) -> Result:
+    def _do(self, http_method: str, endpoint: str, params: Dict = None, data: Dict = None, headers: Dict = {"Accept": "*/*"}, verify = APIConfig.DEFAULT_SSL_VERIFY) -> Result:
         """
         Execute HTTP request with logging and error handling
         
@@ -33,6 +32,7 @@ class RestAdapter:
             params (Dict, optional): Query parameters
             data (Dict, optional): Request body data
             headers (Dict, optional): Request headers
+            veirfy (bool, optional): Whether to verify SSL certificates
                 
         Returns:
             Result: Response data wrapped in Result object
@@ -45,7 +45,6 @@ class RestAdapter:
         log_line_pre = f"method={http_method}, url={full_url}, params={params}"
         
         try:
-            # temporarily disable ssl verification for 
             self._logger.debug(msg=log_line_pre)   
             response = requests.request(
                 method=http_method,

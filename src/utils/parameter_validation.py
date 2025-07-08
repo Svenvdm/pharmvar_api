@@ -1,6 +1,6 @@
 from functools import wraps
-from enums.enums import ValidationRule
-from exceptions.exceptions import ParameterValidationError
+from ..enums import ValidationRule
+from ..exceptions import ParameterValidationError
 
 # Decorator for parameter validation
 def validate_parameters(function):

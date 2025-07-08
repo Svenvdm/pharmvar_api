@@ -6,8 +6,9 @@ class APIConfig:
     """API Configuration settings"""
     DEFAULT_HOST: Final[str] = "www.pharmvar.org/api-service"
     DEFAULT_VERSION: Final[str] = "0.1"
-    DEFAULT_SSL_VERIFY: Final[bool] = False
+    DEFAULT_SSL_VERIFY: Final[bool] = True
     DEFAULT_LOGGER = None
+    DEFAULT_API_KEY: Final[str] = ""
 
 @dataclass(frozen=True)
 class LogConfig:
@@ -17,8 +18,8 @@ class LogConfig:
 
 # Package metadata
 __version__: Final[str] = "0.1.0"
-__author__: Final[str] = "Your Name"
-__author_email__: Final[str] = "your.email@example.com"
+__author__: Final[str] = "Sven van der Maas"
+__author_email__: Final[str] = "svenvdm2013@gmail.com"
 __description__: Final[str] = "A Python client for the PharmVar API"
 
 # HTTP settings

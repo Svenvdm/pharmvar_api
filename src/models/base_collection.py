@@ -1,5 +1,5 @@
 from abc import ABC
-from exceptions.exceptions import ParameterValidationError
+from ..exceptions import ParameterValidationError
 class BaseCollection(ABC):
     def filter(self, **kwargs):
         """

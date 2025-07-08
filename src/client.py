@@ -1,19 +1,22 @@
 import logging
-from exceptions.exceptions import InvalidArgumentError
-from api import RestAdapter, VariantEndpoint, AlleleEndPoint, GeneEndPoint
-from models import Variant, VariantCollection, AlleleCollection, Gene, GeneCollection
+from .exceptions import InvalidArgumentError
+from .api import RestAdapter, VariantEndpoint, AlleleEndPoint, GeneEndPoint
+from .models import Variant, VariantCollection, AlleleCollection, Gene, GeneCollection
 from config import APIConfig
-from enums.enums import QueryParameters, IncludeReferenceVariants, IncludeRetiredAlleles, IncludeRetiredReferenceSequences, Function, EvidenceLevel, ReferenceBaseSequence, ReferenceCollection, ReferenceLocationType, VariantBaseSequence, Position, ReferenceSequence, ExcludeSubAlleles
+from .enums import QueryParameters, IncludeReferenceVariants, IncludeRetiredAlleles, IncludeRetiredReferenceSequences, Function, EvidenceLevel, ReferenceBaseSequence, ReferenceCollection, ReferenceLocationType, VariantBaseSequence, Position, ReferenceSequence, ExcludeSubAlleles
 class PharmVarApi:
     """
     PharmVarApi is a class that provides methods to interact with the PharmVar API.
-    It uses a RestAdapter object to make HTTP requests to the API server.
+    It uses a RestAdapter object to make HTTP requests to the PharmVar API server.
     The class provides methods to get variants, alleles and genes from the PharmVar database.
     """    
     # Initialize the PharmVarApi object with a RestAdapter object
-    def __init__(self, hostname: str = APIConfig.DEFAULT_HOST, api_key: str = '', ver: str = APIConfig.DEFAULT_VERSION, logger: logging.Logger = APIConfig.DEFAULT_LOGGER):
-        self._rest_adapter = RestAdapter(hostname, api_key, ver, logger)
-    
+    def __init__(self, hostname: str = APIConfig.DEFAULT_HOST, api_key: str = '', version: str = APIConfig.DEFAULT_VERSION, logger: logging.Logger = APIConfig.DEFAULT_LOGGER):
+        self._rest_adapter = RestAdapter(hostname, api_key, version, logger)
+        self.api_key = api_key
+        self.version = version
+        self._logger = logger
+
     ###### Variant methods ######
 
     def get_all_variants(self,
