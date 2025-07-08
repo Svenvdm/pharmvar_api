@@ -3,11 +3,11 @@ requires = ["hatchling >= 1.26"]
 build-backend = "hatchling.build"
 
 [project]
-name = "pharmvar-api"
-version = "0.1"
+name = "pharmvar_api"
+version = "0.1.0"
 description = "Python wrapper for the PharmVar API"
 requires-python = ">=3.12"
-keywords = ["PharmVar", "pharmacogenomics", "api wrapper"]
+keywords = ["PharmVar", "pharmacogenomics", "api wrapper", "pharmvar_api"]
 authors = [
     {name = "Sven van der Maas", email = "svenvdm2013@gmail.com"}
 ]
@@ -18,8 +18,6 @@ classifiers = [
   "Development Status :: 4 - Beta",
   "Programming Language :: Python :: 3.12"
 ]
-[tool.hatch.build.targets.wheel]
-packages = ["src/api"]
 
 [project.urls]
 Repository = "https://github.com/Svenvdm/pharmvar_api"
