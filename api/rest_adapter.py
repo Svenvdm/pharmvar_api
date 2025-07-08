@@ -23,7 +23,7 @@ class RestAdapter:
         self._version = version
 
     @validate_parameters
-    def _do(self, http_method: str, endpoint: str, params: Dict = None, data: Dict = None, headers: Dict = {"Accept": "*/*"}, verify = False) -> Result:
+    def _do(self, http_method: str, endpoint: str, params: Dict = None, data: Dict = None, headers: Dict = {"Accept": "*/*"}, verify = True) -> Result:
         """
         Execute HTTP request with logging and error handling
         
