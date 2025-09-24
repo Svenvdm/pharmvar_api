@@ -19,4 +19,4 @@ class ParameterValidationError(PharmVarApiException):
         self.parameter = parameter
         self.value = value
         self.message = message
-        super().__init__(f"{message}. Input value was: {value}")
+        super().__init__(f"{message}")

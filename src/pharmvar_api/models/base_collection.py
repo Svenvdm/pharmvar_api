@@ -9,7 +9,7 @@ class BaseCollection(ABC):
         """
         invalid_attrs = self._get_invalid_attrs(kwargs)
         if invalid_attrs:
-            raise ParameterValidationError(f"Invalid attribute {invalid_attrs} for {self.filter.__name__}")
+            raise ParameterValidationError(invalid_attrs, invalid_attrs, f"Invalid attribute(s) for filtering: {', '.join(invalid_attrs)}")
         return self._filter_items(kwargs)
 
     def _get_invalid_attrs(self, kwargs):
