@@ -12,11 +12,8 @@ class PharmVarApi:
     The class provides methods to get variants, alleles and genes from the PharmVar database.
     """    
     # Initialize the PharmVarApi object with a RestAdapter object
-    def __init__(self, hostname: str = APIConfig.DEFAULT_HOST, api_key: str = '', version: str = APIConfig.DEFAULT_VERSION, logger: logging.Logger = APIConfig.DEFAULT_LOGGER):
+    def __init__(self, api_key: str, hostname: str = APIConfig.DEFAULT_HOST, version: str = APIConfig.DEFAULT_VERSION, logger: logging.Logger = APIConfig.DEFAULT_LOGGER):
         self._rest_adapter = RestAdapter(hostname, api_key, version, logger)
-        self.api_key = api_key
-        self.version = version
-        self._logger = logger
 
     ###### Variant methods ######
 

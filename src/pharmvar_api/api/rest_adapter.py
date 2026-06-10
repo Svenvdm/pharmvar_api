@@ -111,6 +111,8 @@ class RestAdapter:
         # Special handling for 404 errors
         if response.status_code == 404 or (isinstance(data_out, dict) and data_out.get("errorCode") == 404):
             raise NoDataFoundError(error_message)
+        if response.status_code == 401:
+            raise PharmVarApiException(error_message)
         
     def get(self, endpoint: str, params: Dict = None) -> Result:
         """
