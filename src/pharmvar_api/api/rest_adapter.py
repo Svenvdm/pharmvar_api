@@ -20,9 +20,12 @@ class RestAdapter:
         self._api_key = api_key
         self._logger = logger or logging.getLogger(__name__)
         self._version = version
+        self._headers = {
+            "Accept": "*/*",
+            "Api-Key": api_key}
 
     @validate_parameters
-    def _do(self, http_method: str, endpoint: str, params: Dict = None, data: Dict = None, headers: Dict = {"Accept": "*/*"}, verify = APIConfig.DEFAULT_SSL_VERIFY) -> Result:
+    def _do(self, http_method: str, endpoint: str, params: Dict = None, data: Dict = None, headers: Dict = None, verify = APIConfig.DEFAULT_SSL_VERIFY) -> Result:
         """
         Execute HTTP request with logging and error handling
         
@@ -49,7 +52,7 @@ class RestAdapter:
             response = requests.request(
                 method=http_method,
                 url=full_url,
-                headers=headers,
+                headers=self._headers if headers is None else headers,
                 params=params,
                 data=data,
                 verify=verify
