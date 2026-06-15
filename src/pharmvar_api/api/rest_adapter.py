@@ -46,6 +46,7 @@ class RestAdapter:
         """
         full_url = f"{self.url}{endpoint}"
         log_line_pre = f"method={http_method}, url={full_url}, params={params}"
+        log_line_post = ", ".join((log_line_pre, "success={}, status_code={}, message={}"))
         
         try:
             self._logger.debug(msg=log_line_pre)   
@@ -83,13 +84,13 @@ class RestAdapter:
                 except (JSONDecodeError, ValueError):
                     data_out = response.text
         except (JSONDecodeError, ValueError) as e:
-            log_msg = f"{log_line_pre}, success=False, status_code=None, message={str(e)}"
+            log_msg = f"{log_line_post}".format(False, response.status_code, response.reason)
             self._logger.error(msg=log_msg)
             raise PharmVarApiException("Failed to parse response data") from e
 
         # Check for success and handle errors
         is_success = 200 <= response.status_code <= 299
-        log_msg = f"{log_line_pre}, success={is_success}, status_code={response.status_code}, message={response.reason}"
+        log_msg = f"{log_line_post}".format(is_success, response.status_code, response.reason)
         
         if is_success:
             self._logger.debug(msg=log_msg)
@@ -108,10 +109,14 @@ class RestAdapter:
         if not error_message:
             error_message = response.reason
             
-        # Special handling for 404 errors
+        # Special handling for 404 & 401 errors
         if response.status_code == 404 or (isinstance(data_out, dict) and data_out.get("errorCode") == 404):
+            log_msg = f"{log_line_post}".format(False, response.status_code, response.reason)
+            self._logger.error(msg=log_msg)
             raise NoDataFoundError(error_message)
         if response.status_code == 401:
+            log_msg = f"{log_line_post}".format(False, response.status_code, response.reason)
+            self._logger.error(msg=log_msg)
             raise PharmVarApiException(error_message)
         
     def get(self, endpoint: str, params: Dict = None) -> Result:
