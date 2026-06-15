@@ -6,7 +6,7 @@ class APIConfig:
     """API Configuration settings"""
     DEFAULT_HOST: Final[str] = "www.pharmvar.org/api-service"
     DEFAULT_VERSION: Final[str] = "0.2"
-    DEFAULT_SSL_VERIFY: Final[bool] = False
+    DEFAULT_SSL_VERIFY: Final[bool] = True
     DEFAULT_LOGGER = None
     DEFAULT_API_KEY: Final[str] = ""
 
