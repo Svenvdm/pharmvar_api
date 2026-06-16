@@ -35,7 +35,7 @@ class RestAdapter:
             params (Dict, optional): Query parameters
             data (Dict, optional): Request body data
             headers (Dict, optional): Request headers
-            veirfy (bool, optional): Whether to verify SSL certificates
+            verify (bool, optional): Whether to verify SSL certificates
                 
         Returns:
             Result: Response data wrapped in Result object
@@ -46,14 +46,14 @@ class RestAdapter:
         """
         full_url = f"{self.url}{endpoint}"
         log_line_pre = f"method={http_method}, url={full_url}, params={params}"
-        log_line_post = ", ".join((log_line_pre, "success={}, status_code={}, message={}"))
-        
+        log_line_post = ", ".join((log_line_pre.replace("{", "{{").replace("}", "}}"), "success={}, status_code={}, message={}"))
+        request_headers = {**self._headers, **(headers or {})}
         try:
             self._logger.debug(msg=log_line_pre)   
             response = requests.request(
                 method=http_method,
                 url=full_url,
-                headers=self._headers if headers is None else headers,
+                headers=request_headers,
                 params=params,
                 data=data,
                 verify=verify
@@ -67,9 +67,9 @@ class RestAdapter:
         
         # Try to parse response data based on content type
         try:
-            if 'application/json' in content_type or headers.get('Accept') == 'application/json':
+            if 'application/json' in content_type or request_headers.get('Accept') == 'application/json':
                 data_out = response.json()
-            elif 'text/plain' in content_type or headers.get('Accept') == 'text/plain':
+            elif 'text/plain' in content_type or request_headers.get('Accept') == 'text/plain':
                 data_out = response.text
                 # Handle case where error response is JSON even with text/plain
                 if response.status_code >= 400:

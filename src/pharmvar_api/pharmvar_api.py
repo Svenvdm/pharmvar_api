@@ -187,7 +187,7 @@ class PharmVarApi:
         else:
             raise InvalidArgumentError("Either rs_id or spdi must be provided.")
 
-        result = self._rest_adapter._do(http_method = "GET", endpoint = endpoint, headers = {"Accept": "*/*"}, params={})
+        result = self._rest_adapter._do(http_method = "GET", endpoint = endpoint, params = {})
         # Save in Variant instance with rs_id or spdi and impact
         variant = Variant(impact = result.data, rsId = rs_id,
                         referenceSequence = spdi.split(":")[0] if spdi else None,
