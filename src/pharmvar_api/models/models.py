@@ -1,4 +1,4 @@
-from typing import List, Dict
+from typing import Callable, List, Dict
 from .base_collection import BaseCollection
 
 class Result:
@@ -125,6 +125,20 @@ class VariantCollection(BaseCollection):
         # unpack dictionary if variant data is in dictionary format, otherwise it should be a Variant object
         self.variants = [Variant(**variant) if isinstance(variant, dict) else variant for variant in data] if data else []
 
+    def filter(self, predicate: Callable[[Variant], bool]):
+        """
+        Filter the variants in the collection by a given predicate function.
+        :param predicate: A function that takes a Variant object and returns a boolean
+        :return: A new VariantCollection object containing the filtered variants
+        """
+        filtered = [variant for variant in self.variants if predicate(variant)]
+        return VariantCollection(data=filtered)
+
+    def get_variants_with_impact(self):
+        return self.filter(lambda v: v.impact is not None)
+    def get_variants_with_no_impact(self):
+        return self.filter(lambda v: v.impact is None)
+    
     ###todo: create method that gets all the variants with an impact.
 
     def __len__(self) -> int:
@@ -222,7 +236,7 @@ class AlleleCollection(BaseCollection):
     def __len__(self) -> int:
         return len(self.alleles)
 
-    def __getitem__(self, index: int) -> Variant:
+    def __getitem__(self, index: int) -> Allele:
         return self.alleles[index]
 
     def __iter__(self):
@@ -231,7 +245,7 @@ class AlleleCollection(BaseCollection):
     def __repr__(self) -> str:
         return f"{self.alleles}"
     
-class Gene(BaseCollection):
+class Gene:
     """
     A representation of a PharmVar Gene
 
