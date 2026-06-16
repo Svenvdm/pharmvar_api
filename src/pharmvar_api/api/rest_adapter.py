@@ -21,7 +21,7 @@ class RestAdapter:
         self._logger = logger or logging.getLogger(__name__)
         self._version = version
         self._headers = {
-            "Accept": "*/*",
+            "Accept": APIConfig.DEFAULT_HEADER_ACCEPT,
             "Api-Key": api_key}
 
     @validate_parameters

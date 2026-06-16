@@ -9,6 +9,7 @@ class APIConfig:
     DEFAULT_SSL_VERIFY: Final[bool] = True
     DEFAULT_LOGGER = None
     DEFAULT_API_KEY: Final[str] = ""
+    DEFAULT_HEADER_ACCEPT: Final[str] = "*/*"
 
 @dataclass(frozen=True)
 class LogConfig:
