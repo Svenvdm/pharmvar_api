@@ -125,22 +125,21 @@ class VariantCollection(BaseCollection):
         # unpack dictionary if variant data is in dictionary format, otherwise it should be a Variant object
         self.variants = [Variant(**variant) if isinstance(variant, dict) else variant for variant in data] if data else []
 
-    def filter(self, predicate: Callable[[Variant], bool]):
+    def filter(self, **conditions):
         """
         Filter the variants in the collection by a given predicate function.
         :param predicate: A function that takes a Variant object and returns a boolean
         :return: A new VariantCollection object containing the filtered variants
         """
-        filtered = [variant for variant in self.variants if predicate(variant)]
-        return VariantCollection(data=filtered)
+        filtered = [variant for variant in self.variants
+                    if all(getattr(variant, field) == value for field, value in conditions.items())]
+        return VariantCollection(data = filtered)
 
     def get_variants_with_impact(self):
         return self.filter(lambda v: v.impact is not None)
     def get_variants_with_no_impact(self):
         return self.filter(lambda v: v.impact is None)
     
-    ###todo: create method that gets all the variants with an impact.
-
     def __len__(self) -> int:
         return len(self.variants)
 
@@ -227,8 +226,18 @@ class AlleleCollection(BaseCollection):
         """
         if not data:
             data = []
-        # unpack dictionary if variant data is in dictionary format, otherwise it should be a Variant object
         self.alleles = [Allele(**allele) if isinstance(allele, dict) else allele for allele in data]
+
+    def filter(self, **conditions):
+        """
+        Filter the alleles in the collection by a given predicate function.
+        :param predicate: A function that takes an Allele object and returns a boolean
+        :return: A new AlleleCollection object containing the filtered alleles
+        """
+        filtered = [allele for allele in self.alleles
+                    if all(getattr(allele, field) == value for field, value in conditions.items())
+                    ]
+        return AlleleCollection(data = filtered)
 
     def _get_items(self):
         return self.alleles
