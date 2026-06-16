@@ -42,7 +42,7 @@ class PharmVarApi:
             QueryParameters.VARIANT_BASE_SEQUENCE.value: variant_base_sequence
         }
         endpoint = VariantEndpoint.ALL.value
-        result = self._rest_adapter._do(http_method='GET', endpoint=endpoint, params=params)
+        result = self._rest_adapter._do(http_method = "GET", endpoint = endpoint, params = params)
         return VariantCollection(data=result.data)
 
     def get_variants_by_gene(self,
@@ -81,7 +81,7 @@ class PharmVarApi:
         }
 
         endpoint = VariantEndpoint.GENE.value.format(symbol = gene_symbol)
-        result = self._rest_adapter._do(http_method = 'GET', endpoint = endpoint, params = params)
+        result = self._rest_adapter._do(http_method = "GET", endpoint = endpoint, params = params)
         return VariantCollection(data = result.data)
 
     def get_variants_by_allele(self, identifier: str,
@@ -121,7 +121,7 @@ class PharmVarApi:
             QueryParameters.VARIANT_BASE_SEQUENCE.value: variant_base_sequence
         }
         endpoint = VariantEndpoint.ALLELE.value.format(identifier = identifier)
-        result = self._rest_adapter._do(http_method = 'GET', endpoint = endpoint, params = params)
+        result = self._rest_adapter._do(http_method = "GET", endpoint = endpoint, params = params)
         return VariantCollection(data = result.data)
     
     def get_variants_by_rsid(self, rs_id: str,
@@ -158,7 +158,7 @@ class PharmVarApi:
             QueryParameters.VARIANT_BASE_SEQUENCE.value: variant_base_sequence
         }
         endpoint = VariantEndpoint.RSID.value.format(rsId = rs_id)
-        result = self._rest_adapter._do(http_method = 'GET', endpoint = endpoint, params = params)
+        result = self._rest_adapter._do(http_method = "GET", endpoint = endpoint, params = params)
         return VariantCollection(data = result.data)
     
     def get_variants_by_spdi(self, spdi: str) -> VariantCollection:
@@ -168,7 +168,7 @@ class PharmVarApi:
         :return: VariantCollection object containing all variants for the SPDI
         """
         endpoint = VariantEndpoint.SPDI.value.format(spdi = spdi)
-        result = self._rest_adapter._do(http_method = 'GET', endpoint = endpoint)
+        result = self._rest_adapter._do(http_method = "GET", endpoint = endpoint)
         return VariantCollection(data = result.data)
     
     def get_variant_impact(self, *, rs_id: str = None, spdi: str = None) -> str:
@@ -181,13 +181,13 @@ class PharmVarApi:
         if rs_id is not None and spdi is not None:
             raise InvalidArgumentError("Either rs_id or spdi must be provided, not both.")
         if rs_id is not None:
-            endpoint = VariantEndpoint.RSID_IMPACT.value.format(rsId=rs_id)
+            endpoint = VariantEndpoint.RSID_IMPACT.value.format(rsId = rs_id)
         elif spdi is not None:
-            endpoint = VariantEndpoint.SPDI_IMPACT.value.format(spdi= spdi)
+            endpoint = VariantEndpoint.SPDI_IMPACT.value.format(spdi = spdi)
         else:
             raise InvalidArgumentError("Either rs_id or spdi must be provided.")
 
-        result = self._rest_adapter._do(http_method = "GET", endpoint = endpoint, headers={"Accept": "*/*"}, params={})
+        result = self._rest_adapter._do(http_method = "GET", endpoint = endpoint, headers = {"Accept": "*/*"}, params={})
         # Save in Variant instance with rs_id or spdi and impact
         variant = Variant(impact = result.data, rsId = rs_id,
                         referenceSequence = spdi.split(":")[0] if spdi else None,
@@ -205,13 +205,13 @@ class PharmVarApi:
         if rs_id is not None and spdi is not None:
             raise InvalidArgumentError("Either rs_id or spdi must be provided, not both.")
         if rs_id is not None:
-            endpoint = VariantEndpoint.RSID_FREQUENCY.value.format(rsId=rs_id)
+            endpoint = VariantEndpoint.RSID_FREQUENCY.value.format(rsId = rs_id)
         elif spdi is not None:
-            endpoint = VariantEndpoint.SPDI_FREQUENCY.value.format(spdi=spdi)
+            endpoint = VariantEndpoint.SPDI_FREQUENCY.value.format(spdi = spdi)
         else:
             raise InvalidArgumentError("Either rs_id or spdi must be provided.")
 
-        result = self._rest_adapter._do(http_method="GET", endpoint=endpoint)
+        result = self._rest_adapter._do(http_method = "GET", endpoint = endpoint)
         frequency = result.data[0]["frequency"] if result.data else None
         return frequency
 
@@ -267,7 +267,7 @@ class PharmVarApi:
                 QueryParameters.VARIANT_BASE_SEQUENCE.value: variant_base_sequence
             }
             endpoint = AlleleEndPoint.ALL.value
-            result = self._rest_adapter._do(http_method='GET', endpoint=endpoint, params=params)
+            result = self._rest_adapter._do(http_method = "GET", endpoint = endpoint, params = params)
             return AlleleCollection(data=result.data)
 
     def get_all_active_alleles(
@@ -279,8 +279,8 @@ class PharmVarApi:
                 AlleleCollection: Collection of all active alleles
             """
             endpoint = AlleleEndPoint.ACTIVE.value
-            result = self._rest_adapter._do(http_method='GET', endpoint=endpoint)
-            return AlleleCollection(data=result.data)
+            result = self._rest_adapter._do(http_method = "GET", endpoint = endpoint)
+            return AlleleCollection(data = result.data)
     
     def get_allele_by_identifier(
             self, identifier: str,
@@ -330,9 +330,9 @@ class PharmVarApi:
             QueryParameters.REFERENCE_SEQUENCE.value: reference_sequence,
             QueryParameters.VARIANT_BASE_SEQUENCE.value: variant_base_sequence
         }
-        endpoint = AlleleEndPoint.IDENTIFIER.value.format(identifier=identifier)
-        result = self._rest_adapter._do(http_method='GET', endpoint=endpoint, params=params)
-        return AlleleCollection(data=result.data)
+        endpoint = AlleleEndPoint.IDENTIFIER.value.format(identifier = identifier)
+        result = self._rest_adapter._do(http_method = "GET", endpoint = endpoint, params = params)
+        return AlleleCollection(data = result.data)
 
     def get_allele_name(
             self,
@@ -349,8 +349,8 @@ class PharmVarApi:
             QueryParameters.IDENTIFIER.value: identifier,
             QueryParameters.INCLUDE_RETIRED_ALLELES.value: include_retired_alleles
         }
-        endpoint = AlleleEndPoint.ALLELE_NAME.value.format(identifier=identifier)
-        result = self._rest_adapter._do(http_method='GET', endpoint=endpoint, params=params)
+        endpoint = AlleleEndPoint.ALLELE_NAME.value.format(identifier = identifier)
+        result = self._rest_adapter._do(http_method = "GET", endpoint = endpoint, params = params)
         return result.data
     
     def get_allele_evidence_level(
@@ -368,8 +368,8 @@ class PharmVarApi:
             QueryParameters.IDENTIFIER.value: identifier,
             QueryParameters.INCLUDE_RETIRED_ALLELES.value: include_retired_alleles
         }
-        endpoint = AlleleEndPoint.EVIDENCE_LEVEL.value.format(identifier=identifier)
-        result = self._rest_adapter._do(http_method='GET', endpoint=endpoint, params=params)
+        endpoint = AlleleEndPoint.EVIDENCE_LEVEL.value.format(identifier = identifier)
+        result = self._rest_adapter._do(http_method = "GET", endpoint = endpoint, params = params)
         return result.data
     
     def get_allele_function(
@@ -387,8 +387,8 @@ class PharmVarApi:
             QueryParameters.IDENTIFIER.value: identifier,
             QueryParameters.INCLUDE_RETIRED_ALLELES.value: include_retired_alleles
         }
-        endpoint = AlleleEndPoint.function.value.format(identifier=identifier)
-        result = self._rest_adapter._do(http_method='GET', endpoint=endpoint, params=params)
+        endpoint = AlleleEndPoint.function.value.format(identifier = identifier)
+        result = self._rest_adapter._do(http_method = "GET", endpoint = endpoint, params = params)
         return result.data
     def get_allele_pv_id(
             self,
@@ -405,8 +405,8 @@ class PharmVarApi:
             QueryParameters.IDENTIFIER.value: identifier,
             QueryParameters.INCLUDE_RETIRED_ALLELES.value: include_retired_alleles
         }
-        endpoint = AlleleEndPoint.PV_ID.value.format(identifier=identifier)
-        result = self._rest_adapter._do(http_method='GET', endpoint=endpoint, params=params)
+        endpoint = AlleleEndPoint.PV_ID.value.format(identifier = identifier)
+        result = self._rest_adapter._do(http_method = "GET", endpoint = endpoint, params = params)
         return result.data
     
     def get_allele_references(
@@ -424,8 +424,8 @@ class PharmVarApi:
             QueryParameters.IDENTIFIER.value: identifier,
             QueryParameters.INCLUDE_RETIRED_ALLELES.value: include_retired_alleles
         }
-        endpoint = AlleleEndPoint.REFERENCES.value.format(identifier=identifier)
-        result = self._rest_adapter._do(http_method='GET', endpoint=endpoint, params=params)
+        endpoint = AlleleEndPoint.REFERENCES.value.format(identifier = identifier)
+        result = self._rest_adapter._do(http_method = "GET", endpoint = endpoint, params = params)
         return result.data
 
     def get_allele_variants(
@@ -459,10 +459,10 @@ class PharmVarApi:
             QueryParameters.REFERENCE_SEQUENCE.value: reference_sequence,
             QueryParameters.VARIANT_BASE_SEQUENCE.value: variant_base_sequence
         }
-        endpoint = AlleleEndPoint.VARIANTS.value.format(identifier=identifier)
-        result = self._rest_adapter._do(http_method='GET', endpoint=endpoint, params=params)
-        return VariantCollection(data=result.data)
-    
+        endpoint = AlleleEndPoint.VARIANTS.value.format(identifier = identifier)
+        result = self._rest_adapter._do(http_method = "GET", endpoint = endpoint, params = params)
+        return VariantCollection(data = result.data)
+
     ##### Gene methods #####
 
     def get_info_all_genes(
@@ -515,8 +515,8 @@ class PharmVarApi:
         }
 
         endpoint = GeneEndPoint.GENES.value
-        result = self._rest_adapter._do(http_method='GET', endpoint=endpoint, params=params)
-        return GeneCollection(data=result.data)
+        result = self._rest_adapter._do(http_method = "GET", endpoint = endpoint, params = params)
+        return GeneCollection(data = result.data)
 
     def get_gene_by_entrez_id(
         self,
@@ -569,8 +569,8 @@ class PharmVarApi:
             QueryParameters.VARIANT_BASE_SEQUENCE.value: variant_base_sequence
         }
         
-        endpoint = GeneEndPoint.ENTREZ_ID.value.format(entrezId=entrez_id)
-        result = self._rest_adapter._do(http_method='GET', endpoint=endpoint, params=params)
+        endpoint = GeneEndPoint.ENTREZ_ID.value.format(entrezId = entrez_id)
+        result = self._rest_adapter._do(http_method = "GET", endpoint = endpoint, params = params)
         return Gene(**result.data)
     
     def get_gene_by_gene_symbol(
@@ -625,8 +625,8 @@ class PharmVarApi:
             QueryParameters.REFERENCE_SEQUENCE.value: reference_sequence,
             QueryParameters.VARIANT_BASE_SEQUENCE.value: variant_base_sequence
         }
-        endpoint = GeneEndPoint.SYMBOL.value.format(symbol=gene_symbol)
-        result = self._rest_adapter._do(http_method='GET', endpoint=endpoint, params=params)
+        endpoint = GeneEndPoint.SYMBOL.value.format(symbol = gene_symbol)
+        result = self._rest_adapter._do(http_method = "GET", endpoint = endpoint, params = params)
         return Gene(**result.data)
 
     def get_gene_by_hgnc_id(
@@ -683,8 +683,8 @@ class PharmVarApi:
             QueryParameters.VARIANT_BASE_SEQUENCE.value: variant_base_sequence
         }
         
-        endpoint = GeneEndPoint.HGNC.value.format(hgncId=hgnc_id)
-        result = self._rest_adapter._do(http_method='GET', endpoint=endpoint, params=params)
+        endpoint = GeneEndPoint.HGNC.value.format(hgncId = hgnc_id)
+        result = self._rest_adapter._do(http_method = "GET", endpoint = endpoint, params = params)
         return Gene(**result.data)
     
     def get_gene_by_pharmgkb_id(
@@ -739,8 +739,8 @@ class PharmVarApi:
             QueryParameters.REFERENCE_SEQUENCE.value: reference_sequence,
             QueryParameters.VARIANT_BASE_SEQUENCE.value: variant_base_sequence
         }
-        endpoint = GeneEndPoint.PHARMGKB.value.format(pharmgkbId=pharmgkb_id)
-        result = self._rest_adapter._do(http_method='GET', endpoint=endpoint, params=params)
+        endpoint = GeneEndPoint.PHARMGKB.value.format(pharmgkbId = pharmgkb_id)
+        result = self._rest_adapter._do(http_method = "GET", endpoint = endpoint, params = params)
         return Gene(**result.data)
     
     def get_gene_list(self) -> list[str]:
@@ -749,5 +749,5 @@ class PharmVarApi:
         :return: List of gene symbols
         """
         endpoint = GeneEndPoint.LIST.value
-        result = self._rest_adapter._do(http_method='GET', endpoint=endpoint)
+        result = self._rest_adapter._do(http_method = "GET", endpoint = endpoint)
         return result.data
