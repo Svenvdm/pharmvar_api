@@ -1,20 +1,31 @@
+"""Module containing RestAdapter class for making HTTP requests to the PharmVar API."""
+
+from json import JSONDecodeError
+from typing import Dict
+from http import HTTPStatus
 import logging
 import requests
 from requests_cache import CachedSession
-from json import JSONDecodeError
-from typing import Dict
 from ..exceptions import PharmVarApiException, NoDataFoundError
 from ..models import Result
 from ..config import APIConfig, CacheSettings
 from ..utils import validate_parameters
 
 class RestAdapter:
-    def __init__(self, hostname: str = APIConfig.DEFAULT_HOST , api_key: str = APIConfig.DEFAULT_API_KEY, version: str = APIConfig.DEFAULT_VERSION, logger: logging.Logger = APIConfig.DEFAULT_LOGGER):
+    """
+    Adapter class to handle REST API requests to the PharmVar API.
+    """
+    def __init__(self,
+                    hostname: str = APIConfig.DEFAULT_HOST,
+                    api_key: str = APIConfig.DEFAULT_API_KEY,
+                    version: str = APIConfig.DEFAULT_VERSION,
+                    logger: logging.Logger = APIConfig.DEFAULT_LOGGER):
         """
         :param hostname: The hostname of the API server: e.g. www.pharmvar.org/api-service
         :param api_key (optional): The API key to use for authentication
         :param version: The version of the API to use: currently only "0.1" is supported
-        :param logger (optional): pass your logger here to use it, otherwise a new logger will be created
+        :param logger (optional): pass your logger here to use it,
+        otherwise a new logger will be created
         """
         self._session = CachedSession(
             cache_name = CacheSettings.DEFAULT_CACHE_NAME,
@@ -33,7 +44,14 @@ class RestAdapter:
             "Api-Key": api_key}
 
     @validate_parameters
-    def _do(self, http_method: str, endpoint: str, params: Dict = None, data: Dict = None, headers: Dict = None, verify = APIConfig.DEFAULT_SSL_VERIFY) -> Result:
+    def _do(self,
+            http_method: str,
+            endpoint: str,
+            params: Dict = None,
+            data: Dict = None,
+            headers: Dict = None,
+            verify = APIConfig.DEFAULT_SSL_VERIFY
+        ) -> Result:
         """
         Execute HTTP request with logging and error handling
         
@@ -54,10 +72,11 @@ class RestAdapter:
         """
         full_url = f"{self.url}{endpoint}"
         log_line_pre = f"method={http_method}, url={full_url}, params={params}"
-        log_line_post = ", ".join((log_line_pre.replace("{", "{{").replace("}", "}}"), "success={}, status_code={}, message={}"))
+        log_line_post = ", ".join((log_line_pre.replace("{", "{{").replace("}", "}}"),
+                                "success={}, status_code={}, message={}"))
         request_headers = {**self._headers, **(headers or {})}
         try:
-            self._logger.debug(msg = log_line_pre)   
+            self._logger.debug(msg = log_line_pre)
             response = self._session.request(
                 method = http_method,
                 url = full_url,
@@ -72,19 +91,22 @@ class RestAdapter:
 
         # Check content type of response
         content_type = response.headers.get('Content-Type', '')
-        
+
         # Try to parse response data based on content type
         try:
-            if 'application/json' in content_type or request_headers.get('Accept') == 'application/json':
+            if 'application/json' in content_type or \
+                request_headers.get('Accept') == 'application/json':
                 data_out = response.json()
-            elif 'text/plain' in content_type or request_headers.get('Accept') == 'text/plain':
+            elif 'text/plain' in content_type or \
+                request_headers.get('Accept') == 'text/plain':
+
                 data_out = response.text
                 # Handle case where error response is JSON even with text/plain
-                if response.status_code >= 400:
+                if response.status_code >= HTTPStatus.BAD_REQUEST:
                     try:
                         data_out = response.json()
-                    except:
-                        pass
+                    except (JSONDecodeError, ValueError) as e:
+                        raise PharmVarApiException(f"Error response is not JSON: {data_out}") from e
             else:
                 # For */* or unknown content types, try JSON first then fall back to text
                 try:
@@ -96,37 +118,42 @@ class RestAdapter:
             self._logger.error(msg = log_msg)
             raise PharmVarApiException("Failed to parse response data") from e
 
-        # Check for success and handle errors
-        is_success = 200 <= response.status_code <= 299
+        # Check for success and handle errors (between 200 and 299)
+        is_success = HTTPStatus.OK <= response.status_code < HTTPStatus.MULTIPLE_CHOICES
         log_msg = f"{log_line_post}".format(is_success, response.status_code, response.reason)
-        
+
         if is_success:
             self._logger.debug(msg = log_msg)
-            result = Result(status_code=response.status_code, message=response.reason, data=data_out)
+            result = Result(status_code=response.status_code,
+                            message=response.reason, data=data_out)
             if not result.data and isinstance(data_out, (list, dict)):
                 raise NoDataFoundError(f"No data found for endpoint: {endpoint}")
             return result
 
         # Handle error response
         self._logger.error(msg = log_msg)
-        
+
         # Extract error message from response
         error_message = None
         if isinstance(data_out, dict):
             error_message = data_out.get("errorMessage")
         if not error_message:
             error_message = response.reason
-            
+
         # Special handling for 404 & 401 errors
-        if response.status_code == 404 or (isinstance(data_out, dict) and data_out.get("errorCode") == 404):
+        if response.status_code == HTTPStatus.NOT_FOUND or \
+            (isinstance(data_out, dict) and data_out.get("errorCode") == HTTPStatus.NOT_FOUND):
             log_msg = f"{log_line_post}".format(False, response.status_code, response.reason)
             self._logger.error(msg = log_msg)
             raise NoDataFoundError(error_message)
-        if response.status_code == 401:
+        if response.status_code == HTTPStatus.UNAUTHORIZED:
             log_msg = f"{log_line_post}".format(False, response.status_code, response.reason)
             self._logger.error(msg = log_msg)
             raise PharmVarApiException(error_message)
-        
+        raise PharmVarApiException(
+            f"API request failed with status{response.status_code}: {error_message}"
+        )
+
     def get(self, endpoint: str, params: Dict = None) -> Result:
         """
         Perform an HTTP GET request to the API
@@ -135,11 +162,3 @@ class RestAdapter:
         :return: A Result object containing the status code, message, and data
         """
         return self._do("GET", endpoint, params = params)
-    
-
-
-
-        
-
-
-
