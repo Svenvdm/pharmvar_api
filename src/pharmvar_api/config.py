@@ -17,5 +17,14 @@ class LogConfig:
     DEFAULT_LOG_LEVEL: Final[str] = "INFO"
     DEFAULT_LOG_FORMAT: Final[str] = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 
+@dataclass(frozen=True)
+class CacheSettings:
+    "Cache configuration settings"
+    DEFAULT_CACHE_NAME: Final[str] = "pharmvar_api_cache"
+    DEFAULT_CACHE_BACKEND: Final[str] = "sqlite"
+    DEFAULT_EXPIRY_TIME: Final[int] = 3600  # seconds
+    DEFAULT_ALLOWABLE_METHODS: Final[list] = ("GET")
+    DEFAULT_ALLOWABLE_CODES: Final[list] = (200,)
+
 # Rate limiting
 RATE_LIMIT: Final[int] = 120 # requests per minute
