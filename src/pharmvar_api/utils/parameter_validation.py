@@ -2,7 +2,6 @@ from functools import wraps
 from ..enums import ValidationRule
 from ..exceptions import ParameterValidationError
 
-# Decorator for parameter validation
 def validate_parameters(function):
     """
     Decorator to validate parameters passed to the API request.
@@ -23,13 +22,12 @@ def validate_parameters(function):
                 rule = ValidationRule.get_rule(param_name)
                 # Check against valid values list if provided
                 if "valid_values" in rule and param_value not in rule["valid_values"]:
-                    raise ParameterValidationError(parameter=param_name, value=param_value, message=rule["error_message"])
+                    raise ParameterValidationError(parameter = param_name, value = param_value, message = rule["error_message"])
                 
                 # Run custom validator function if provided
                 if "validator" in rule and param_value is not None:
                     if not rule["validator"](param_value):
-                        raise ParameterValidationError(parameter=param_name, value=param_value, message=rule["error_message"])
+                        raise ParameterValidationError(parameter = param_name, value = param_value, message = rule["error_message"])
         # Call the original function if all validations pass
         return function(*args, **kwargs)
-                    
     return wrapper

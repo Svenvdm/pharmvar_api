@@ -1,10 +1,11 @@
 import logging
 import requests
+from requests_cache import CachedSession
 from json import JSONDecodeError
 from typing import Dict
 from ..exceptions import PharmVarApiException, NoDataFoundError
 from ..models import Result
-from ..config import APIConfig
+from ..config import APIConfig, CacheSettings
 from ..utils import validate_parameters
 
 class RestAdapter:
@@ -15,7 +16,14 @@ class RestAdapter:
         :param version: The version of the API to use: currently only "0.1" is supported
         :param logger (optional): pass your logger here to use it, otherwise a new logger will be created
         """
+        self._session = CachedSession(
+            cache_name = CacheSettings.DEFAULT_CACHE_NAME,
+            backend = CacheSettings.DEFAULT_CACHE_BACKEND,
+            expire_after = CacheSettings.DEFAULT_EXPIRY_TIME,
+            allowable_methods = CacheSettings.DEFAULT_ALLOWABLE_METHODS,
+            allowable_codes = CacheSettings.DEFAULT_ALLOWABLE_CODES
 
+        )
         self.url = f"https://{hostname}/"
         self._api_key = api_key
         self._logger = logger or logging.getLogger(__name__)
@@ -49,17 +57,17 @@ class RestAdapter:
         log_line_post = ", ".join((log_line_pre.replace("{", "{{").replace("}", "}}"), "success={}, status_code={}, message={}"))
         request_headers = {**self._headers, **(headers or {})}
         try:
-            self._logger.debug(msg=log_line_pre)   
-            response = requests.request(
-                method=http_method,
-                url=full_url,
-                headers=request_headers,
-                params=params,
-                data=data,
-                verify=verify
+            self._logger.debug(msg = log_line_pre)   
+            response = self._session.request(
+                method = http_method,
+                url = full_url,
+                headers = request_headers,
+                params = params,
+                data = data,
+                verify = verify
             )
         except requests.exceptions.RequestException as e:
-            self._logger.error(msg=str(e))
+            self._logger.error(msg = str(e))
             raise PharmVarApiException("Request failed") from e
 
         # Check content type of response
@@ -85,7 +93,7 @@ class RestAdapter:
                     data_out = response.text
         except (JSONDecodeError, ValueError) as e:
             log_msg = f"{log_line_post}".format(False, response.status_code, response.reason)
-            self._logger.error(msg=log_msg)
+            self._logger.error(msg = log_msg)
             raise PharmVarApiException("Failed to parse response data") from e
 
         # Check for success and handle errors
@@ -93,14 +101,14 @@ class RestAdapter:
         log_msg = f"{log_line_post}".format(is_success, response.status_code, response.reason)
         
         if is_success:
-            self._logger.debug(msg=log_msg)
+            self._logger.debug(msg = log_msg)
             result = Result(status_code=response.status_code, message=response.reason, data=data_out)
             if not result.data and isinstance(data_out, (list, dict)):
                 raise NoDataFoundError(f"No data found for endpoint: {endpoint}")
             return result
 
         # Handle error response
-        self._logger.error(msg=log_msg)
+        self._logger.error(msg = log_msg)
         
         # Extract error message from response
         error_message = None
@@ -112,11 +120,11 @@ class RestAdapter:
         # Special handling for 404 & 401 errors
         if response.status_code == 404 or (isinstance(data_out, dict) and data_out.get("errorCode") == 404):
             log_msg = f"{log_line_post}".format(False, response.status_code, response.reason)
-            self._logger.error(msg=log_msg)
+            self._logger.error(msg = log_msg)
             raise NoDataFoundError(error_message)
         if response.status_code == 401:
             log_msg = f"{log_line_post}".format(False, response.status_code, response.reason)
-            self._logger.error(msg=log_msg)
+            self._logger.error(msg = log_msg)
             raise PharmVarApiException(error_message)
         
     def get(self, endpoint: str, params: Dict = None) -> Result:
