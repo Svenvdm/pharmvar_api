@@ -1,5 +1,6 @@
 import logging
-from .exceptions import InvalidArgumentError
+
+from .exceptions import InvalidArgumentError, NoDataFoundError
 from .api import RestAdapter
 from .models import Variant, VariantCollection, AlleleCollection, Gene, GeneCollection
 from .api import AlleleEndPoint, GeneEndPoint, VariantEndpoint
@@ -121,7 +122,10 @@ class PharmVarApi:
             QueryParameters.VARIANT_BASE_SEQUENCE.value: variant_base_sequence
         }
         endpoint = VariantEndpoint.ALLELE.value.format(identifier = identifier)
-        result = self._rest_adapter._do(http_method = "GET", endpoint = endpoint, params = params)
+        try:
+            result = self._rest_adapter._do(http_method = "GET", endpoint = endpoint, params = params)
+        except NoDataFoundError as e:
+            return VariantCollection(data=[])
         return VariantCollection(data = result.data)
     
     def get_variants_by_rsid(self, rs_id: str,
