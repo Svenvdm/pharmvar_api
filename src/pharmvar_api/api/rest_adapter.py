@@ -50,7 +50,6 @@ class RestAdapter:
             params: Dict = None,
             data: Dict = None,
             headers: Dict = None,
-            verify = APIConfig.DEFAULT_SSL_VERIFY
         ) -> Result:
         """
         Execute HTTP request with logging and error handling
@@ -61,7 +60,6 @@ class RestAdapter:
             params (Dict, optional): Query parameters
             data (Dict, optional): Request body data
             headers (Dict, optional): Request headers
-            verify (bool, optional): Whether to verify SSL certificates
                 
         Returns:
             Result: Response data wrapped in Result object
@@ -83,7 +81,6 @@ class RestAdapter:
                 headers = request_headers,
                 params = params,
                 data = data,
-                verify = verify
             )
         except requests.exceptions.RequestException as e:
             self._logger.error(msg = str(e))
