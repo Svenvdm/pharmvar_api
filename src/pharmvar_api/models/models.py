@@ -7,7 +7,7 @@ class Result:
         Result returned from low-level RestAdapter
         :param status_code: Standard HTTP Status code
         :param message: Human readable result
-        :param data: Python List of Dictionaries (or maybe just a single Dictionary on error)
+        :param data: list of dictionaries containing the data returned from the API
         """
         self.status_code = int(status_code)
         self.message = str(message)

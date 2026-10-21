@@ -219,7 +219,7 @@ class PharmVarApi:
         frequency = result.data[0]["frequency"] if result.data else None
         return frequency
 
-        ###### Allele methods ######
+    ###### Allele methods ######
 
     def get_all_alleles(
             self,
